@@ -7,6 +7,9 @@
     --colour-primary: #5b5bd6;
     --colour-primary-hover: #4949bd;
 
+    --colour-brand: #21897e;
+    --colour-brand-hover: #17665f;
+
     --page-width: 1200px;
     --border-radius: 0.75rem;
 }

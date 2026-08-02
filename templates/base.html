@@ -9,19 +9,23 @@
         content="width=device-width, initial-scale=1"
     >
 
-    <title>
-        {% block title %}Vocabio{% endblock %}
-    </title>
+    <title>{% block title %}Vocabio{% endblock %}</title>
 
     <link
         rel="stylesheet"
         href="{% static 'css/base.css' %}"
+    >
+    <link
+        rel="stylesheet"
+        href="{% static 'css/components/header.css' %}"
     >
 
     {% block extra_css %}{% endblock %}
 </head>
 
 <body>
+    {% include "components/header.html" %}
+
     <main class="page">
         {% block content %}{% endblock %}
     </main>

@@ -1,0 +1,37 @@
+{% load static %}
+
+<header class="site-header">
+    <div class="site-header__container">
+        <a
+            class="site-header__brand"
+            href="{% url 'core:home' %}"
+            aria-label="Vocabio home page"
+        >
+            <img
+                class="site-header__brand-logo"
+                src="{% static 'images/vocabio_logo.png' %}"
+                alt=""
+                width="24"
+                height="24"
+            >
+
+            <span class="site-header__brand-text">
+                Vocabio
+            </span>
+        </a>
+
+        <nav
+            class="site-header__navigation"
+            aria-label="Main navigation"
+        >
+            <a
+                class="site-header__login"
+                href="#"
+                title="Coming soon"
+                aria-label="Log in — coming soon"
+            >
+                Log in
+            </a>
+        </nav>
+    </div>
+</header>
