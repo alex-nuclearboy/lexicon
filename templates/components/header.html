@@ -24,14 +24,29 @@
             class="site-header__navigation"
             aria-label="Main navigation"
         >
-            <a
-                class="site-header__login"
-                href="#"
-                title="Coming soon"
-                aria-label="Log in — coming soon"
-            >
-                Log in
-            </a>
+            {% if user.is_authenticated %}
+                <form
+                    class="site-header__logout-form"
+                    method="post"
+                    action="{% url 'accounts:logout' %}"
+                >
+                    {% csrf_token %}
+
+                    <button
+                        class="site-header__auth-action"
+                        type="submit"
+                    >
+                        Log out
+                    </button>
+                </form>
+            {% else %}
+                <a
+                    class="site-header__auth-action"
+                    href="{% url 'accounts:login' %}"
+                >
+                    Log in
+                </a>
+            {% endif %}
         </nav>
     </div>
 </header>

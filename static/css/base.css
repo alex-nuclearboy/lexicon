@@ -10,6 +10,8 @@
     --colour-brand: #21897e;
     --colour-brand-hover: #17665f;
 
+    --colour-error: #b42318;
+
     --page-width: 1200px;
     --border-radius: 0.75rem;
 }

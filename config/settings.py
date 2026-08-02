@@ -220,6 +220,21 @@ CSRF_COOKIE_SECURE = not DEBUG
 
 
 # ---------------------------------------------------------------------------
+# Authentication
+# ---------------------------------------------------------------------------
+
+# The application has a single owner account. Visitors only enter its password.
+SITE_OWNER_USERNAME = get_str_env(
+    "SITE_OWNER_USERNAME",
+    default="admin",
+)
+
+LOGIN_URL = "accounts:login"
+LOGIN_REDIRECT_URL = "core:home"
+LOGOUT_REDIRECT_URL = "core:home"
+
+
+# ---------------------------------------------------------------------------
 # Application definition
 # ---------------------------------------------------------------------------
 
