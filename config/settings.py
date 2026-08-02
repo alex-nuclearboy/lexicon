@@ -250,7 +250,7 @@ ROOT_URLCONF = "config.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -350,6 +350,10 @@ USE_TZ = True
 # ---------------------------------------------------------------------------
 
 STATIC_URL = "static/"
+
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
 
 # collectstatic places all production static files in this directory.
 STATIC_ROOT = BASE_DIR / "staticfiles"
