@@ -37,14 +37,6 @@
     letter-spacing: -0.035em;
 }
 
-.login-card__description {
-    margin: 0.625rem 0 0;
-
-    color: var(--colour-text-muted);
-
-    font-size: 0.9375rem;
-}
-
 /* Form */
 
 .login-form {
@@ -234,14 +226,150 @@
     border: 0;
 }
 
-@media (max-width: 40rem) {
+/* Tablet layout */
+
+@media (max-width: 64rem) {
     .login-page {
-        min-height: calc(100dvh - 4rem);
-        padding: 2rem 1rem;
+        min-height: calc(100dvh - 4.25rem);
+        padding: 1.75rem 1.25rem;
     }
 
     .login-card {
-        padding: 1.75rem 1.25rem;
+        width: min(100%, 24rem);
+        padding: 1.5rem;
+    }
+
+    .login-card__header {
+        margin-bottom: 1.25rem;
+    }
+
+    .login-card__title {
+        font-size: 1.5rem;
+    }
+
+    .login-form {
+        gap: 0.875rem;
+    }
+
+    .login-form__field {
+        gap: 0.375rem;
+    }
+
+    .login-form__label {
+        font-size: 0.875rem;
+    }
+
+    .login-form__input {
+        min-height: 2.75rem;
+        padding: 0.625rem 0.75rem;
+    }
+
+    .login-form__input::placeholder {
+        font-size: 0.875rem;
+    }
+
+    .login-form__submit {
+        min-height: 2.75rem;
+        padding: 0.625rem 0.875rem;
+    }
+
+    .login-card__required-note {
+        margin-top: 0.75rem;
+        font-size: 0.75rem;
+    }
+
+    .login-card__logo-link {
+        width: 3.5rem;
+        height: 3.5rem;
+        margin-top: 1.125rem;
+    }
+
+    .login-card__logo {
+        width: 3rem;
+        height: 3rem;
+    }
+}
+
+/* Mobile layout */
+
+@media (max-width: 40rem) {
+    .login-page {
+        min-height: calc(100dvh - 3.75rem);
+        padding: 1rem 0.75rem;
+    }
+
+    .login-card {
+        width: min(100%, 19rem);
+        padding: 0.875rem;
+
+        border-radius: 0.75rem;
+
+        box-shadow:
+            0 0.125rem 0.375rem rgb(23 25 35 / 4%),
+            0 0.625rem 1.5rem rgb(23 25 35 / 6%);
+    }
+
+    .login-card__header {
+        margin-bottom: 0.75rem;
+    }
+
+    .login-card__title {
+        font-size: 1.125rem;
+        letter-spacing: -0.025em;
+    }
+
+    .login-form {
+        gap: 0.625rem;
+    }
+
+    .login-form__field {
+        gap: 0.25rem;
+    }
+
+    .login-form__label {
+        font-size: 0.75rem;
+    }
+
+    .login-form__input {
+        min-height: 2.625rem;
+        padding: 0.5rem 0.625rem;
+        font-size: 1rem;
+    }
+
+    .login-form__input::placeholder {
+        font-size: 0.8125rem;
+    }
+
+    .login-form__error,
+    .login-form__general-errors p {
+        font-size: 0.75rem;
+    }
+
+    .login-form__general-errors {
+        padding: 0.5rem 0.625rem;
+    }
+
+    .login-form__submit {
+        min-height: 2.625rem;
+        padding: 0.5rem 0.625rem;
+
+        font-size: 0.8125rem;
+    }
+
+    .login-card__required-note {
+        margin-top: 0.5rem;
+        font-size: 0.6875rem;
+    }
+
+    .login-card__logo-link {
+        width: 2.5rem;
+        height: 2.5rem;
+        margin-top: 0.75rem;
+    }
+
+    .login-card__logo {
+        width: 2.125rem;
+        height: 2.125rem;
     }
 }
 
