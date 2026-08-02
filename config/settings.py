@@ -225,6 +225,7 @@ CSRF_COOKIE_SECURE = not DEBUG
 
 INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
+    "core.apps.CoreConfig",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
