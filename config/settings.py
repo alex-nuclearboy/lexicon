@@ -71,6 +71,15 @@ def get_required_env(name: str) -> str:
     return value
 
 
+def get_str_env(name: str, default: str) -> str:
+    """
+    Read a text environment variable.
+
+    Missing, empty, and whitespace-only values use the default value.
+    """
+    return os.getenv(name, default).strip() or default
+
+
 def get_bool_env(name: str, default: bool = False) -> bool:
     """
     Read and validate a Boolean environment variable.
@@ -319,9 +328,15 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalisation
 # ---------------------------------------------------------------------------
 
-LANGUAGE_CODE = "en-us"
+LANGUAGE_CODE = get_str_env(
+    "DJANGO_LANGUAGE_CODE",
+    default="en-us",
+)
 
-TIME_ZONE = "UTC"
+TIME_ZONE = get_str_env(
+    "DJANGO_TIME_ZONE",
+    default="UTC",
+)
 
 USE_I18N = True
 
