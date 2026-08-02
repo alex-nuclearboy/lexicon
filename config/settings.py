@@ -13,12 +13,37 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 
+import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv(BASE_DIR / ".env")
+
+def get_int_env(name: str, default: int) -> int:
+    """
+    Read a non-negative integer from an environment variable.
+
+    Use the provided default value when the environment variable is not set.
+    Leading and trailing whitespace is ignored.
+    """
+    raw_value = os.getenv(name, str(default)).strip()
+
+    try:
+        value = int(raw_value)
+    except ValueError as exc:
+        raise ImproperlyConfigured(
+            f"{name} must be an integer, got {raw_value!r}."
+        ) from exc
+
+    if value < 0:
+        raise ImproperlyConfigured(
+            f"{name} must not be negative."
+        )
+
+    return value
 
 
 # Quick-start development settings - unsuitable for production
@@ -86,11 +111,74 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+DATABASE_URL = os.getenv("DATABASE_URL", "").strip()
+
+if not DATABASE_URL:
+    raise ImproperlyConfigured(
+        "DATABASE_URL is not set. "
+        "Add it to the local .env file or to the Koyeb environment variables."
+    )
+
+DATABASE_CONN_MAX_AGE = get_int_env(
+    "DATABASE_CONN_MAX_AGE",
+    default=0,
+)
+
+DATABASE_CONNECT_TIMEOUT = get_int_env(
+    "DATABASE_CONNECT_TIMEOUT",
+    default=5,
+)
+
+try:
+    database_config = dj_database_url.parse(
+        DATABASE_URL,
+        conn_max_age=DATABASE_CONN_MAX_AGE,
+        conn_health_checks=DATABASE_CONN_MAX_AGE > 0,
+    )
+except (TypeError, ValueError) as exc:
+    raise ImproperlyConfigured(
+        "DATABASE_URL has an invalid format."
+    ) from exc
+
+if database_config.get("ENGINE") != "django.db.backends.postgresql":
+    raise ImproperlyConfigured(
+        "DATABASE_URL must use PostgreSQL."
+    )
+
+
+required_database_values = {
+    "NAME": "database name",
+    "USER": "database user",
+    "PASSWORD": "database password",
+    "HOST": "database host",
+}
+
+missing_database_values = [
+    description
+    for key, description in required_database_values.items()
+    if not database_config.get(key)
+]
+
+if missing_database_values:
+    missing = ", ".join(missing_database_values)
+
+    raise ImproperlyConfigured(
+        f"DATABASE_URL is missing: {missing}."
+    )
+
+
+database_options = database_config.get("OPTIONS") or {}
+
+database_options.setdefault(
+    "connect_timeout",
+    DATABASE_CONNECT_TIMEOUT,
+)
+
+database_config["OPTIONS"] = database_options
+
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
+    "default": database_config,
 }
 
 
