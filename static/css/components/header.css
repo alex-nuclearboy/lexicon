@@ -4,13 +4,9 @@
 }
 
 .site-header__container {
-    width: min(
-        calc(100% - 3rem),
-        var(--page-width)
-    );
-
+    width: 100%;
     min-height: 4.5rem;
-    margin-inline: auto;
+    padding-inline: 3.5rem;
 
     display: flex;
     align-items: center;
@@ -126,10 +122,10 @@
 
 @media (max-width: 40rem) {
     .site-header__container {
-        width: min(
-            calc(100% - 2rem),
-            var(--page-width)
-        );
+        .site-header__container {
+            min-height: 4rem;
+            padding-inline: 1rem;
+        }
 
         min-height: 4rem;
     }
