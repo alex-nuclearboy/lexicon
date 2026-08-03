@@ -9,9 +9,16 @@ from django.core.exceptions import NON_FIELD_ERRORS
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
-from django.views.decorators.http import require_POST
+from django.views.decorators.cache import never_cache
+from django.views.decorators.csrf import csrf_protect
+from django.views.decorators.debug import sensitive_post_parameters
+from django.views.decorators.http import (
+    require_http_methods,
+    require_POST,
+)
 
 from core.utils import get_client_ip
+
 from .access import can_access_application
 from .forms import ApplicationLoginForm
 from .ui_messages import LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL
@@ -56,6 +63,10 @@ def _get_safe_redirect_url(
     return None
 
 
+@sensitive_post_parameters()
+@never_cache
+@require_http_methods(["GET", "POST"])
+@csrf_protect
 def login_view(request: HttpRequest) -> HttpResponse:
     """Authenticate a user and start an application session.
 
@@ -124,7 +135,9 @@ def login_view(request: HttpRequest) -> HttpResponse:
     )
 
 
+@never_cache
 @require_POST
+@csrf_protect
 def logout_view(request: HttpRequest) -> HttpResponse:
     """End the current session and redirect after logout.
 
