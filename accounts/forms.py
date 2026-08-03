@@ -1,13 +1,20 @@
 """Authentication forms for the accounts application."""
 
+import logging
 from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
+from core.utils import get_client_ip
 from accounts.access import can_access_application
 from accounts.ui_messages import APPLICATION_ACCESS_DENIED
+
+
+audit_logger = logging.getLogger(
+    f"vocabio.audit.{__name__}"
+)
 
 
 class ApplicationLoginForm(AuthenticationForm):
@@ -68,6 +75,19 @@ class ApplicationLoginForm(AuthenticationForm):
         super().confirm_login_allowed(user)
 
         if not can_access_application(user):
+            client_ip = (
+                get_client_ip(self.request)
+                if self.request is not None
+                else "unknown"
+            )
+
+            audit_logger.warning(
+                "[AUTH|DENIED] Authenticated account denied "
+                "application access | user_id=%s | ip=%s.",
+                user.pk,
+                client_ip,
+            )
+
             raise ValidationError(
                 self.error_messages["access_denied"],
                 code="access_denied",

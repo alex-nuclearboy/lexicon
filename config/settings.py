@@ -16,6 +16,8 @@ import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
+from .logging import build_logging_config
+
 
 # ---------------------------------------------------------------------------
 # Project paths
@@ -385,3 +387,12 @@ STORAGES = {
         ),
     },
 }
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+
+LOGGING = build_logging_config(
+    base_dir=BASE_DIR,
+    debug=DEBUG,
+)
