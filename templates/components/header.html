@@ -1,18 +1,18 @@
-{% load static %}
+{% load i18n static %}
 
 <header class="site-header">
     <div class="site-header__container">
         <a
             class="site-header__brand"
             href="{% url 'core:home' %}"
-            aria-label="Vocabio home page"
+            aria-label="{% translate 'Vocabio home page' %}"
         >
             <img
                 class="site-header__brand-logo"
                 src="{% static 'images/vocabio_logo.png' %}"
                 alt=""
-                width="24"
-                height="24"
+                width="36"
+                height="36"
             >
 
             <span class="site-header__brand-text">
@@ -22,7 +22,7 @@
 
         <nav
             class="site-header__navigation"
-            aria-label="Main navigation"
+            aria-label="{% translate 'Main navigation' %}"
         >
             {% if user.is_authenticated %}
                 <form
@@ -36,7 +36,7 @@
                         class="site-header__auth-action"
                         type="submit"
                     >
-                        Log out
+                        {% translate "Log out" %}
                     </button>
                 </form>
             {% else %}
@@ -44,7 +44,7 @@
                     class="site-header__auth-action"
                     href="{% url 'accounts:login' %}"
                 >
-                    Log in
+                    {% translate "Log in" %}
                 </a>
             {% endif %}
         </nav>
