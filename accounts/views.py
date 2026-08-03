@@ -1,12 +1,14 @@
 """Authentication views for the accounts application."""
 
 import logging
+
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import login, logout
+from django.contrib.auth import REDIRECT_FIELD_NAME, login, logout
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
+from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.http import require_POST
 
 from core.utils import get_client_ip
@@ -18,6 +20,40 @@ from .ui_messages import LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL
 audit_logger = logging.getLogger(
     f"vocabio.audit.{__name__}"
 )
+
+
+def _get_safe_redirect_url(
+    request: HttpRequest,
+) -> str | None:
+    """Return a safe redirect target requested by the login flow.
+
+    POST data is checked first so the target survives an unsuccessful form
+    submission. Query parameters are used as a fallback for the initial login
+    request.
+
+    Args:
+        request: The current HTTP request.
+
+    Returns:
+        A validated local or same-host redirect URL, or ``None`` when no safe
+        target was provided.
+    """
+    redirect_to = (
+        request.POST.get(REDIRECT_FIELD_NAME)
+        or request.GET.get(REDIRECT_FIELD_NAME)
+    )
+
+    if not redirect_to:
+        return None
+
+    if url_has_allowed_host_and_scheme(
+        url=redirect_to,
+        allowed_hosts={request.get_host()},
+        require_https=request.is_secure(),
+    ):
+        return redirect_to
+
+    return None
 
 
 def login_view(request: HttpRequest) -> HttpResponse:
@@ -32,11 +68,15 @@ def login_view(request: HttpRequest) -> HttpResponse:
     Returns:
         A redirect after successful authentication or a rendered login page.
     """
+    redirect_url = _get_safe_redirect_url(request)
+
     if (
         request.user.is_authenticated
         and can_access_application(request.user)
     ):
-        return redirect(settings.LOGIN_REDIRECT_URL)
+        return redirect(
+            redirect_url or settings.LOGIN_REDIRECT_URL
+        )
 
     form = ApplicationLoginForm(
         request=request,
@@ -60,7 +100,9 @@ def login_view(request: HttpRequest) -> HttpResponse:
 
                 messages.success(request, LOGIN_SUCCESSFUL)
 
-                return redirect(settings.LOGIN_REDIRECT_URL)
+                return redirect(
+                    redirect_url or settings.LOGIN_REDIRECT_URL
+                )
 
         elif form.has_error(
             NON_FIELD_ERRORS,
@@ -75,7 +117,10 @@ def login_view(request: HttpRequest) -> HttpResponse:
     return render(
         request,
         "accounts/login.html",
-        {"form": form},
+        {
+            "form": form,
+            REDIRECT_FIELD_NAME: redirect_url or "",
+        },
     )
 
 

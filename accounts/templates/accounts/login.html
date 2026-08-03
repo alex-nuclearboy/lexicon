@@ -34,6 +34,14 @@
             >
                 {% csrf_token %}
 
+                {% if next %}
+                    <input
+                        type="hidden"
+                        name="next"
+                        value="{{ next }}"
+                    >
+                {% endif %}
+
                 {% for hidden_field in form.hidden_fields %}
                     {{ hidden_field }}
                 {% endfor %}
