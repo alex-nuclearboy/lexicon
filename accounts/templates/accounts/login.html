@@ -71,7 +71,26 @@
                             {% endif %}
                         </label>
 
-                        {{ field }}
+                        {% if field.name == "password" %}
+                            <div class="password-control">
+                                {{ field }}
+
+                                <button
+                                    class="password-control__toggle"
+                                    type="button"
+                                    aria-controls="{{ field.id_for_label }}"
+                                    aria-pressed="false"
+                                    data-show-label="{% translate 'Show' %}"
+                                    data-hide-label="{% translate 'Hide' %}"
+                                >
+                                    <span class="password-control__toggle-text">
+                                        {% translate "Show" %}
+                                    </span>
+                                </button>
+                            </div>
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
 
                         {% for error in field.errors %}
                             <p
@@ -112,4 +131,11 @@
             </a>
         </div>
     </section>
+{% endblock %}
+
+{% block extra_js %}
+    <script
+        src="{% static 'accounts/js/login.js' %}"
+        defer
+    ></script>
 {% endblock %}

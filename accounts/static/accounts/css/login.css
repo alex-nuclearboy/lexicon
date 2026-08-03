@@ -94,6 +94,44 @@
     outline-offset: 4px;
 }
 
+.password-control {
+    position: relative;
+}
+
+.password-control .form-control {
+    padding-inline-end: 4.75rem;
+}
+
+.password-control__toggle {
+    position: absolute;
+    inset-block: 0;
+    inset-inline-end: 0.875rem;
+
+    padding: 0;
+
+    border: 0;
+
+    background: transparent;
+    color: var(--colour-primary);
+
+    font: inherit;
+    font-size: 0.875rem;
+    font-weight: 650;
+
+    cursor: pointer;
+}
+
+.password-control__toggle:hover {
+    text-decoration: underline;
+}
+
+.password-control__toggle:focus-visible {
+    border-radius: 0.25rem;
+
+    outline: 3px solid rgb(33 137 126 / 25%);
+    outline-offset: 3px;
+}
+
 /* Tablet. */
 @media (max-width: 64rem) and (min-width: 40.0625rem) {
     .login-card {
