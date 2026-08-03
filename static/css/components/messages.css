@@ -1,0 +1,35 @@
+.messages {
+    width: min(
+        calc(100% - 3rem),
+        var(--page-width)
+    );
+
+    margin: 1rem auto 0;
+
+    display: grid;
+    gap: 0.75rem;
+}
+
+.message {
+    margin: 0;
+    padding: 0.75rem 1rem;
+
+    border: 0;
+    border-inline-start: 0.25rem solid currentColor;
+    border-radius: 0.5rem;
+
+    background: var(--colour-surface);
+    color: var(--colour-text);
+
+    font-size: 0.9375rem;
+}
+
+.message--success {
+    background: var(--colour-success-background);
+    color: var(--colour-success);
+}
+
+.message--error {
+    background: var(--colour-error-background);
+    color: var(--colour-error);
+}

@@ -1,9 +1,11 @@
-{% load static %}
+{% load i18n static %}
+{% get_current_language as LANGUAGE_CODE %}
 
 <!DOCTYPE html>
-<html lang="en-GB">
+<html lang="{{ LANGUAGE_CODE|default:'en-gb' }}">
 <head>
     <meta charset="UTF-8">
+
     <meta
         name="viewport"
         content="width=device-width, initial-scale=1"
@@ -35,6 +37,22 @@
         rel="stylesheet"
         href="{% static 'css/base.css' %}"
     >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/components/button.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/components/form.css' %}"
+    >
+
+    <link
+        rel="stylesheet"
+        href="{% static 'css/components/messages.css' %}"
+    >
+
     <link
         rel="stylesheet"
         href="{% static 'css/components/header.css' %}"
@@ -47,6 +65,8 @@
     {% include "components/header.html" %}
 
     <main class="page">
+        {% include "components/messages.html" %}
+
         {% block content %}{% endblock %}
     </main>
 

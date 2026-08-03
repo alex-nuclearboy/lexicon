@@ -1,0 +1,13 @@
+{% if messages %}
+    <div
+        class="messages"
+        aria-live="polite"
+        aria-atomic="true"
+    >
+        {% for message in messages %}
+            <p class="message{% if message.tags %} message--{{ message.tags }}{% endif %}">
+                {{ message }}
+            </p>
+        {% endfor %}
+    </div>
+{% endif %}

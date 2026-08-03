@@ -1,7 +1,9 @@
 {% extends "base.html" %}
-{% load static %}
+{% load i18n static %}
 
-{% block title %}Log in | Vocabio{% endblock %}
+{% block title %}
+    {% translate "Log in" %} | Vocabio
+{% endblock %}
 
 {% block extra_css %}
     <link
@@ -21,9 +23,8 @@
                     class="login-card__title"
                     id="login-title"
                 >
-                    Log in
+                    {% translate "Log in" %}
                 </h1>
-
             </header>
 
             <form
@@ -33,9 +34,13 @@
             >
                 {% csrf_token %}
 
+                {% for hidden_field in form.hidden_fields %}
+                    {{ hidden_field }}
+                {% endfor %}
+
                 {% if form.non_field_errors %}
                     <div
-                        class="login-form__general-errors"
+                        class="form-errors"
                         role="alert"
                     >
                         {% for error in form.non_field_errors %}
@@ -44,57 +49,58 @@
                     </div>
                 {% endif %}
 
-                <div class="login-form__field">
-                    <label
-                        class="login-form__label"
-                        for="{{ form.password.id_for_label }}"
-                    >
-                        Password
-
-                        <span
-                            class="login-form__required-marker"
-                            aria-hidden="true"
+                {% for field in form.visible_fields %}
+                    <div class="form-field">
+                        <label
+                            class="form-field__label"
+                            for="{{ field.id_for_label }}"
                         >
-                            *
-                        </span>
+                            {{ field.label }}
 
-                        <span class="visually-hidden">
-                            required
-                        </span>
-                    </label>
+                            {% if field.field.required %}
+                                <span
+                                    class="form-field__required-marker"
+                                    aria-hidden="true"
+                                >
+                                    *
+                                </span>
 
-                    {{ form.password }}
+                                <span class="visually-hidden">
+                                    {% translate "required" %}
+                                </span>
+                            {% endif %}
+                        </label>
 
-                    {% for error in form.password.errors %}
-                        <p
-                            class="login-form__error"
-                            role="alert"
-                        >
-                            {{ error }}
-                        </p>
-                    {% endfor %}
-                </div>
+                        {{ field }}
+
+                        {% for error in field.errors %}
+                            <p
+                                class="form-field__error"
+                                role="alert"
+                            >
+                                {{ error }}
+                            </p>
+                        {% endfor %}
+                    </div>
+                {% endfor %}
 
                 <button
-                    class="login-form__submit"
+                    class="button button--primary login-form__submit"
                     type="submit"
                 >
-                    Log in
+                    {% translate "Log in" %}
                 </button>
             </form>
 
-            <p
-                class="login-card__required-note"
-                id="password-required-note"
-            >
+            <p class="login-card__required-note">
                 <span aria-hidden="true">*</span>
-                Required field
+                {% translate "Required field" %}
             </p>
 
             <a
                 class="login-card__logo-link"
                 href="{% url 'core:home' %}"
-                aria-label="Return to the Vocabio home page"
+                aria-label="{% translate 'Return to the Vocabio home page' %}"
             >
                 <img
                     class="login-card__logo"

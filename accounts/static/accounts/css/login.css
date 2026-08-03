@@ -1,5 +1,6 @@
 .login-page {
-    min-height: calc(100dvh - 4.5rem);
+    flex: 1;
+
     padding: 3rem 1.5rem;
 
     display: grid;
@@ -15,9 +16,7 @@
 
     background: var(--colour-surface);
 
-    box-shadow:
-        0 0.25rem 0.75rem rgb(23 25 35 / 5%),
-        0 1.25rem 3rem rgb(23 25 35 / 8%);
+    box-shadow: var(--shadow-card);
 
     text-align: center;
 }
@@ -31,13 +30,11 @@
 
     color: var(--colour-text);
 
-    font-size: clamp(1.75rem, 5vw, 2rem);
+    font-size: 2rem;
     font-weight: 750;
     line-height: 1.2;
     letter-spacing: -0.035em;
 }
-
-/* Form */
 
 .login-form {
     display: grid;
@@ -46,118 +43,10 @@
     text-align: left;
 }
 
-.login-form__field {
-    display: grid;
-    gap: 0.5rem;
-}
-
-.login-form__label {
-    color: var(--colour-text);
-
-    font-size: 0.9375rem;
-    font-weight: 650;
-}
-
-.login-form__required-marker {
-    color: var(--colour-error, #b42318);
-}
-
-.login-form__input {
-    width: 100%;
-    min-height: 3rem;
-    padding: 0.75rem 0.875rem;
-
-    border: 1px solid var(--colour-border);
-    border-radius: var(--border-radius);
-
-    background: var(--colour-surface);
-    color: var(--colour-text);
-
-    outline: none;
-
-    transition:
-        border-color 150ms ease,
-        box-shadow 150ms ease;
-}
-
-.login-form__input::placeholder {
-    color: var(--colour-text-muted);
-    opacity: 0.7;
-}
-
-.login-form__input:hover {
-    border-color: var(--colour-brand);
-}
-
-.login-form__input:focus {
-    border-color: var(--colour-brand);
-
-    box-shadow:
-        0 0 0 0.25rem rgb(33 137 126 / 15%);
-}
-
-.login-form__error,
-.login-form__general-errors p {
-    margin: 0;
-
-    color: var(--colour-error, #b42318);
-
-    font-size: 0.875rem;
-    line-height: 1.4;
-}
-
-.login-form__general-errors {
-    padding: 0.75rem 0.875rem;
-
-    border: 1px solid rgb(180 35 24 / 25%);
-    border-radius: var(--border-radius);
-
-    background: rgb(180 35 24 / 6%);
-}
-
-/* Submit button */
-
 .login-form__submit {
-    min-height: 3rem;
-    padding: 0.75rem 1rem;
-
-    border: 1px solid var(--colour-brand);
-    border-radius: var(--border-radius);
-
-    background: var(--colour-brand);
-    color: #ffffff;
-
-    font: inherit;
-    font-weight: 700;
-
-    cursor: pointer;
-
-    transition:
-        filter 150ms ease,
-        box-shadow 150ms ease,
-        transform 150ms ease;
+    width: 100%;
+    margin-top: 0.25rem;
 }
-
-.login-form__submit:hover {
-    filter: brightness(1.1);
-
-    box-shadow:
-        0 0.5rem 1.25rem rgb(33 137 126 / 25%);
-
-    transform: translateY(-1px);
-}
-
-.login-form__submit:focus-visible {
-    outline: 3px solid rgb(33 137 126 / 30%);
-    outline-offset: 3px;
-}
-
-.login-form__submit:active {
-    filter: brightness(0.9);
-    transform: translateY(0);
-}
-
-/* Required field note */
 
 .login-card__required-note {
     margin: 1rem 0 0;
@@ -168,10 +57,8 @@
 }
 
 .login-card__required-note span {
-    color: var(--colour-error, #b42318);
+    color: var(--colour-error);
 }
-
-/* Logo */
 
 .login-card__logo-link {
     width: 4.5rem;
@@ -209,179 +96,11 @@
     outline-offset: 4px;
 }
 
-/* Accessibility */
-
-.visually-hidden {
-    position: absolute;
-
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-
-    overflow: hidden;
-    clip: rect(0 0 0 0);
-    white-space: nowrap;
-
-    border: 0;
-}
-
-/* Tablet layout */
-
-@media (max-width: 64rem) {
-    .login-page {
-        min-height: calc(100dvh - 4.25rem);
-        padding: 1.75rem 1.25rem;
-    }
-
-    .login-card {
-        width: min(100%, 24rem);
-        padding: 1.5rem;
-    }
-
-    .login-card__header {
-        margin-bottom: 1.25rem;
-    }
-
-    .login-card__title {
-        font-size: 1.5rem;
-    }
-
-    .login-form {
-        gap: 0.875rem;
-    }
-
-    .login-form__field {
-        gap: 0.375rem;
-    }
-
-    .login-form__label {
-        font-size: 0.875rem;
-    }
-
-    .login-form__input {
-        min-height: 2.75rem;
-        padding: 0.625rem 0.75rem;
-    }
-
-    .login-form__input::placeholder {
-        font-size: 0.875rem;
-    }
-
-    .login-form__submit {
-        min-height: 2.75rem;
-        padding: 0.625rem 0.875rem;
-    }
-
-    .login-card__required-note {
-        margin-top: 0.75rem;
-        font-size: 0.75rem;
-    }
-
-    .login-card__logo-link {
-        width: 3.5rem;
-        height: 3.5rem;
-        margin-top: 1.125rem;
-    }
-
-    .login-card__logo {
-        width: 3rem;
-        height: 3rem;
-    }
-}
-
-/* Mobile layout */
-
-@media (max-width: 40rem) {
-    .login-page {
-        min-height: calc(100dvh - 3.75rem);
-        padding: 1rem 0.75rem;
-    }
-
-    .login-card {
-        width: min(100%, 19rem);
-        padding: 0.875rem;
-
-        border-radius: 0.75rem;
-
-        box-shadow:
-            0 0.125rem 0.375rem rgb(23 25 35 / 4%),
-            0 0.625rem 1.5rem rgb(23 25 35 / 6%);
-    }
-
-    .login-card__header {
-        margin-bottom: 0.75rem;
-    }
-
-    .login-card__title {
-        font-size: 1.125rem;
-        letter-spacing: -0.025em;
-    }
-
-    .login-form {
-        gap: 0.625rem;
-    }
-
-    .login-form__field {
-        gap: 0.25rem;
-    }
-
-    .login-form__label {
-        font-size: 0.75rem;
-    }
-
-    .login-form__input {
-        min-height: 2.625rem;
-        padding: 0.5rem 0.625rem;
-        font-size: 1rem;
-    }
-
-    .login-form__input::placeholder {
-        font-size: 0.8125rem;
-    }
-
-    .login-form__error,
-    .login-form__general-errors p {
-        font-size: 0.75rem;
-    }
-
-    .login-form__general-errors {
-        padding: 0.5rem 0.625rem;
-    }
-
-    .login-form__submit {
-        min-height: 2.625rem;
-        padding: 0.5rem 0.625rem;
-
-        font-size: 0.8125rem;
-    }
-
-    .login-card__required-note {
-        margin-top: 0.5rem;
-        font-size: 0.6875rem;
-    }
-
-    .login-card__logo-link {
-        width: 2.5rem;
-        height: 2.5rem;
-        margin-top: 0.75rem;
-    }
-
-    .login-card__logo {
-        width: 2.125rem;
-        height: 2.125rem;
-    }
-}
-
 @media (prefers-reduced-motion: reduce) {
-    .login-form__input,
-    .login-form__submit,
     .login-card__logo-link {
         transition: none;
     }
 
-    .login-form__submit:hover,
-    .login-form__submit:active,
     .login-card__logo-link:hover {
         transform: none;
     }

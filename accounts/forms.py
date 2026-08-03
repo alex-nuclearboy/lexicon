@@ -17,6 +17,7 @@ class ApplicationLoginForm(AuthenticationForm):
         label=_("Username"),
         widget=forms.TextInput(
             attrs={
+                "class": "form-control",
                 "autocomplete": "username",
                 "autofocus": True,
                 "placeholder": _("Enter your username"),
@@ -32,6 +33,7 @@ class ApplicationLoginForm(AuthenticationForm):
         strip=False,
         widget=forms.PasswordInput(
             attrs={
+                "class": "form-control",
                 "autocomplete": "current-password",
                 "placeholder": _("Enter your password"),
             }
