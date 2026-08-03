@@ -1,58 +1,72 @@
+"""Authentication forms for the accounts application."""
+
 from django import forms
-from django.conf import settings
-from django.contrib.auth import authenticate
-from django.contrib.auth.models import AbstractBaseUser
-from django.http import HttpRequest
+from django.contrib.auth.base_user import AbstractBaseUser
+from django.contrib.auth.forms import AuthenticationForm
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
+
+from accounts.access import can_access_application
+from accounts.ui_messages import APPLICATION_ACCESS_DENIED
 
 
-class OwnerLoginForm(forms.Form):
+class ApplicationLoginForm(AuthenticationForm):
+    """Authenticate a user and enforce the application access policy."""
+
+    username = forms.CharField(
+        label=_("Username"),
+        widget=forms.TextInput(
+            attrs={
+                "autocomplete": "username",
+                "autofocus": True,
+                "placeholder": _("Enter your username"),
+            }
+        ),
+        error_messages={
+            "required": _("Enter your username."),
+        },
+    )
+
     password = forms.CharField(
-        label="Password",
-        required=True,
+        label=_("Password"),
         strip=False,
         widget=forms.PasswordInput(
             attrs={
-                "class": "login-form__input",
                 "autocomplete": "current-password",
-                "autofocus": True,
-                "placeholder": "Enter your password",
-                "aria-required": "true",
-                "aria-describedby": "password-required-note",
+                "placeholder": _("Enter your password"),
             }
         ),
+        error_messages={
+            "required": _("Enter your password."),
+        },
     )
 
-    def __init__(
+    error_messages = {
+        "invalid_login": _(
+            "Please enter a correct username and password. "
+            "Note that both fields may be case-sensitive."
+        ),
+        "inactive": _("This account is inactive."),
+        "access_denied": APPLICATION_ACCESS_DENIED,
+    }
+
+    def confirm_login_allowed(
         self,
-        *args,
-        request: HttpRequest | None = None,
-        **kwargs,
+        user: AbstractBaseUser,
     ) -> None:
-        super().__init__(*args, **kwargs)
+        """Confirm that an authenticated user may access the application.
 
-        self.request = request
-        self.user_cache: AbstractBaseUser | None = None
+        Args:
+            user: The successfully authenticated user.
 
-    def clean(self) -> dict:
-        cleaned_data = super().clean()
-        password = cleaned_data.get("password")
+        Raises:
+            ValidationError: If the account is inactive or the user does not
+                have permission to access the application.
+        """
+        super().confirm_login_allowed(user)
 
-        if not password:
-            return cleaned_data
-
-        self.user_cache = authenticate(
-            request=self.request,
-            username=settings.SITE_OWNER_USERNAME,
-            password=password,
-        )
-
-        if self.user_cache is None:
-            self.add_error(
-                "password",
-                "The password is incorrect.",
+        if not can_access_application(user):
+            raise ValidationError(
+                self.error_messages["access_denied"],
+                code="access_denied",
             )
-
-        return cleaned_data
-
-    def get_user(self) -> AbstractBaseUser | None:
-        return self.user_cache
