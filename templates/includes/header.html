@@ -1,0 +1,98 @@
+{% load i18n static %}
+
+<header class="site-header">
+    <div class="site-header__container">
+        <a
+            class="site-header__brand"
+            href="{% url 'core:home' %}"
+            aria-label="{% translate 'Vocabio home page' %}"
+        >
+            <img
+                class="site-header__brand-logo"
+                src="{% static 'images/vocabio_logo.png' %}"
+                alt=""
+                width="36"
+                height="36"
+            >
+
+            <span class="site-header__brand-text">
+                Vocabio
+            </span>
+        </a>
+
+        <nav
+            class="site-header__navigation"
+            aria-label="{% translate 'Account navigation' %}"
+        >
+            {% if user.is_authenticated %}
+                <div class="site-header__account-actions">
+                    <div
+                        class="site-header__menu"
+                        data-header-menu
+                        data-open="false"
+                    >
+                        <button
+                            class="site-header__menu-toggle"
+                            type="button"
+                            aria-label="{% translate 'Open menu' %}"
+                            aria-controls="site-header-account-menu"
+                            aria-expanded="false"
+                            data-header-menu-toggle
+                            data-open-label="{% translate 'Open menu' %}"
+                            data-close-label="{% translate 'Close menu' %}"
+                        >
+                            <span
+                                class="site-header__menu-icon"
+                                aria-hidden="true"
+                            >
+                                <span></span>
+                                <span></span>
+                                <span></span>
+                            </span>
+                        </button>
+
+                        <div
+                            class="site-header__dropdown"
+                            id="site-header-account-menu"
+                            aria-hidden="true"
+                            data-header-menu-panel
+                        >
+                            <ul class="site-header__dropdown-list">
+                                <li>
+                                    <a
+                                        class="site-header__dropdown-link"
+                                        href="{% url 'accounts:password_change' %}"
+                                    >
+                                        {% translate "Change password" %}
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <form
+                        class="site-header__logout-form"
+                        method="post"
+                        action="{% url 'accounts:logout' %}"
+                    >
+                        {% csrf_token %}
+
+                        <button
+                            class="site-header__auth-action"
+                            type="submit"
+                        >
+                            {% translate "Log out" %}
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <a
+                    class="site-header__auth-action"
+                    href="{% url 'accounts:login' %}"
+                >
+                    {% translate "Log in" %}
+                </a>
+            {% endif %}
+        </nav>
+    </div>
+</header>
