@@ -1,2 +1,4 @@
-# lexicon
-A personal vocabulary project for learning and organising English words
+# Vocabio
+
+Vocabio is a personal vocabulary application for collecting, organising and
+studying English words.
