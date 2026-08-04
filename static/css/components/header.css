@@ -39,9 +39,7 @@
     line-height: 1;
     white-space: nowrap;
 
-    transition:
-        color 180ms ease,
-        transform 180ms ease;
+    transition: color 180ms ease;
 }
 
 .site-header__brand-logo {
@@ -60,8 +58,6 @@
 
 .site-header__brand:hover {
     color: var(--colour-brand-hover);
-
-    transform: translateY(-1px);
 }
 
 .site-header__brand:hover .site-header__brand-logo {
@@ -239,7 +235,6 @@
         transition: none;
     }
 
-    .site-header__brand:hover,
     .site-header__brand:hover .site-header__brand-logo,
     .site-header__auth-action:hover,
     .site-header__auth-action:active {
