@@ -36,10 +36,6 @@ from .ui_messages import (
     PASSWORD_CHANGE_SUCCESSFUL,
 )
 
-logger = logging.getLogger(
-    f"vocabio.{__name__}"
-)
-
 audit_logger = logging.getLogger(
     f"vocabio.audit.{__name__}"
 )
@@ -95,22 +91,6 @@ def login_view(request: HttpRequest) -> HttpResponse:
     Returns:
         A redirect after successful authentication or a rendered login page.
     """
-    diagnostic_case = request.GET.get(
-        "probe",
-        "unlabelled",
-    )
-
-    audit_logger.warning(
-        "[SECURITY|PROXY_DIAGNOSTIC] "
-        "case=%s | x_forwarded_proto=%r | "
-        "scheme=%s | is_secure=%s | http_host=%r.",
-        diagnostic_case,
-        request.META.get("HTTP_X_FORWARDED_PROTO"),
-        request.scheme,
-        request.is_secure(),
-        request.META.get("HTTP_HOST"),
-    )
-
     redirect_url = _get_safe_redirect_url(request)
 
     if (
