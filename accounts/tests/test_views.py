@@ -291,6 +291,10 @@ class AuthenticationViewTests(TestCase):
             captured_logs.output[0],
         )
         self.assertIn(
+            "username=restricted",
+            captured_logs.output[0],
+        )
+        self.assertIn(
             f"user_id={self.denied_user.pk}",
             captured_logs.output[0],
         )

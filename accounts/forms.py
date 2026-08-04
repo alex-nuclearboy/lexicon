@@ -83,7 +83,8 @@ class ApplicationLoginForm(AuthenticationForm):
 
             audit_logger.warning(
                 "[AUTH|DENIED] Authenticated account denied "
-                "application access | user_id=%s | ip=%s.",
+                "application access | username=%s | user_id=%s | ip=%s.",
+                user.get_username(),
                 user.pk,
                 client_ip,
             )
