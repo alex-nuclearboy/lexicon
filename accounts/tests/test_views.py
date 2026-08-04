@@ -143,11 +143,11 @@ class AuthenticationViewTests(TestCase):
 
         self.assertContains(
             response,
-            "Enter your username.",
+            "Username is required.",
         )
         self.assertContains(
             response,
-            "Enter your password.",
+            "Password is required.",
         )
 
     def test_login_rejects_unsupported_http_methods(

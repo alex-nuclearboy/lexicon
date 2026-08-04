@@ -31,7 +31,7 @@ class ApplicationLoginForm(AuthenticationForm):
             }
         ),
         error_messages={
-            "required": _("Enter your username."),
+            "required": _("Username is required."),
         },
     )
 
@@ -46,7 +46,7 @@ class ApplicationLoginForm(AuthenticationForm):
             }
         ),
         error_messages={
-            "required": _("Enter your password."),
+            "required": _("Password is required."),
         },
     )
 
