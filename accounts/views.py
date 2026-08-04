@@ -95,12 +95,20 @@ def login_view(request: HttpRequest) -> HttpResponse:
     Returns:
         A redirect after successful authentication or a rendered login page.
     """
-    logger.warning(
+    diagnostic_case = request.GET.get(
+        "probe",
+        "unlabelled",
+    )
+
+    audit_logger.warning(
         "[SECURITY|PROXY_DIAGNOSTIC] "
-        "x_forwarded_proto=%r | scheme=%s | is_secure=%s.",
+        "case=%s | x_forwarded_proto=%r | "
+        "scheme=%s | is_secure=%s | http_host=%r.",
+        diagnostic_case,
         request.META.get("HTTP_X_FORWARDED_PROTO"),
         request.scheme,
         request.is_secure(),
+        request.META.get("HTTP_HOST"),
     )
 
     redirect_url = _get_safe_redirect_url(request)
