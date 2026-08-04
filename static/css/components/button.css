@@ -38,7 +38,7 @@
     background: var(--colour-brand-hover);
 
     box-shadow:
-        0 0.5rem 1.25rem rgb(33 137 126 / 25%);
+        0 0.5rem 1.25rem rgb(var(--colour-brand-rgb) / 25%);
 
     transform: translateY(-1px);
 }
@@ -49,7 +49,7 @@
 }
 
 .button:focus-visible {
-    outline: 3px solid rgb(33 137 126 / 30%);
+    outline: 3px solid rgb(var(--colour-brand-rgb) / 30%);
     outline-offset: 3px;
 }
 

@@ -47,7 +47,7 @@
     border-color: var(--colour-brand);
 
     box-shadow:
-        0 0 0 0.25rem rgb(33 137 126 / 15%);
+        0 0 0 0.25rem rgb(var(--colour-brand-rgb) / 15%);
 }
 
 .form-control[aria-invalid="true"] {

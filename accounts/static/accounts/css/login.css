@@ -83,14 +83,14 @@
 .login-card__logo-link:hover {
     filter:
         drop-shadow(
-            0 0 0.5rem rgb(33 137 126 / 25%)
+            0 0 0.5rem rgb(var(--colour-brand-rgb) / 25%)
         );
 
     transform: translateY(-1px) scale(1.015);
 }
 
 .login-card__logo-link:focus-visible {
-    outline: 3px solid rgb(33 137 126 / 25%);
+    outline: 3px solid rgb(var(--colour-brand-rgb) / 25%);
     outline-offset: 4px;
 }
 
@@ -128,7 +128,7 @@
 .password-control__toggle:focus-visible {
     border-radius: 0.25rem;
 
-    outline: 3px solid rgb(33 137 126 / 25%);
+    outline: 3px solid rgb(var(--colour-brand-rgb) / 25%);
     outline-offset: 3px;
 }
 

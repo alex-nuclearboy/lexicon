@@ -123,11 +123,11 @@
 .site-header__auth-action:hover {
     border-color: var(--colour-brand);
 
-    background: rgb(33 137 126 / 6%);
+    background: rgb(var(--colour-brand-rgb) / 6%);
     color: var(--colour-brand-hover);
 
     box-shadow:
-        0 0.375rem 1rem rgb(33 137 126 / 12%);
+        0 0.375rem 1rem rgb(var(--colour-brand-rgb) / 12%);
 
     transform: translateY(-1px);
 }
@@ -142,7 +142,7 @@
 
 .site-header__brand:focus-visible,
 .site-header__auth-action:focus-visible {
-    outline: 3px solid rgb(33 137 126 / 25%);
+    outline: 3px solid rgb(var(--colour-brand-rgb) / 25%);
     outline-offset: 3px;
 }
 
