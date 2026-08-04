@@ -216,6 +216,11 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
+koyeb_instance_id = os.getenv("KOYEB_INSTANCE_ID", "").strip()
+
+if koyeb_instance_id:
+    ALLOWED_HOSTS.append(koyeb_instance_id)
+
 # Production cookies are transmitted only over HTTPS.
 SESSION_COOKIE_SECURE = not DEBUG
 CSRF_COOKIE_SECURE = not DEBUG
