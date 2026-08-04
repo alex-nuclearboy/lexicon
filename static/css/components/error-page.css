@@ -1,9 +1,9 @@
 /* Shared layout for application error and system-message pages. */
 
 .error-page {
+    flex: 1;
+
     display: grid;
-    min-height: calc(100vh - var(--header-height, 4rem));
-    min-height: calc(100dvh - var(--header-height, 4rem));
     padding: 3rem 1.5rem;
     place-items: center;
 }
@@ -11,11 +11,13 @@
 .error-page__card {
     width: min(100%, 38rem);
     padding: 2.75rem;
+
     text-align: center;
-    background-color: var(--colour-surface, #ffffff);
-    border: 1px solid var(--colour-border, #dfe3e8);
-    border-radius: 1rem;
-    box-shadow: 0 0.75rem 2rem rgb(15 23 42 / 8%);
+
+    background-color: var(--colour-surface);
+    border: 1px solid var(--colour-border);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-card);
 }
 
 .error-page__icon {
@@ -23,50 +25,63 @@
     width: 4rem;
     height: 4rem;
     margin: 0 auto 1.5rem;
+
     font-size: 1.75rem;
     font-weight: 700;
     line-height: 1;
+
     border-radius: 50%;
+
     place-items: center;
 }
 
 .error-page__code {
     margin: 0 0 0.75rem;
+
+    color: var(--colour-text-muted);
+
     font-size: 0.875rem;
     font-weight: 700;
     letter-spacing: 0.08em;
-    color: var(--colour-text-muted, #52606d);
     text-transform: uppercase;
 }
 
 .error-page__title {
     margin: 0;
+
+    color: var(--colour-text);
+
     font-size: clamp(1.75rem, 4vw, 2.25rem);
     line-height: 1.2;
-    color: var(--colour-text, #17212b);
 }
 
 .error-page__description {
-    margin: 1.25rem auto 0;
     max-width: 32rem;
+    margin: 1.25rem auto 0;
+
+    color: var(--colour-text-muted);
+
     line-height: 1.65;
-    color: var(--colour-text-muted, #52606d);
 }
 
 .error-page__message {
     margin: 1.5rem 0 0;
     padding: 1rem 1.25rem;
+
     font-weight: 600;
     line-height: 1.5;
-    border-radius: 0.75rem;
+
+    border-radius: var(--border-radius);
 }
 
 .error-page__note {
-    margin: 1.25rem auto 0;
     max-width: 30rem;
+    margin: 1.25rem auto 0;
+
+    color: var(--colour-text-muted);
+
     font-size: 0.9375rem;
     line-height: 1.6;
-    color: var(--colour-text-muted, #52606d);
 }
 
 .error-page__actions {
@@ -77,40 +92,56 @@
     margin-top: 1.75rem;
 }
 
+.error-page__link {
+    display: inline-block;
+
+    color: var(--colour-text);
+
+    font-weight: 700;
+    text-decoration: none;
+}
+
+.error-page__link:hover {
+    text-decoration: underline;
+    text-decoration-thickness: 0.08em;
+    text-underline-offset: 0.2em;
+}
+
+.error-page__link:focus-visible {
+    outline: 0.2rem solid
+        rgb(var(--colour-brand-rgb) / 25%);
+    outline-offset: 0.2rem;
+}
+
 /* Neutral states such as a missing page. */
 
 .error-page--neutral .error-page__icon {
-    color: var(--colour-text-muted, #52606d);
-    background-color: var(--colour-surface-muted, #eef1f4);
-}
-
-.error-page--neutral .error-page__message {
-    color: var(--colour-text, #17212b);
-    background-color: var(--colour-surface-muted, #eef1f4);
+    color: var(--colour-text-muted);
+    background-color: var(--colour-neutral-background);
 }
 
 /* Warning states such as temporary lockouts and rate limits. */
 
-.error-page--warning .error-page__icon {
-    color: var(--colour-warning-text, #8a4b08);
-    background-color: var(--colour-warning-background, #fff4df);
-}
-
+.error-page--warning .error-page__icon,
 .error-page--warning .error-page__message {
-    color: var(--colour-warning-text, #8a4b08);
-    background-color: var(--colour-warning-background, #fff4df);
+    color: var(--colour-warning);
+    background-color: var(--colour-warning-background);
 }
 
-/* Error states such as forbidden access and server errors. */
-
-.error-page--error .error-page__icon {
-    color: var(--colour-error-text, #a02727);
-    background-color: var(--colour-error-background, #fff0f0);
+.error-page--warning .error-page__code {
+    color: var(--colour-warning);
 }
 
+/* Error states such as forbidden access. */
+
+.error-page--error .error-page__icon,
 .error-page--error .error-page__message {
-    color: var(--colour-error-text, #a02727);
-    background-color: var(--colour-error-background, #fff0f0);
+    color: var(--colour-error);
+    background-color: var(--colour-error-background);
+}
+
+.error-page--error .error-page__code {
+    color: var(--colour-error);
 }
 
 @media (max-width: 40rem) {
@@ -121,6 +152,7 @@
 
     .error-page__card {
         padding: 2rem 1.25rem;
+
         background-color: transparent;
         border: 0;
         box-shadow: none;
@@ -129,6 +161,7 @@
     .error-page__icon {
         width: 3.5rem;
         height: 3.5rem;
+
         font-size: 1.5rem;
     }
 }

@@ -15,6 +15,11 @@
     --colour-error: #b42318;
     --colour-error-background: #fff4f2;
 
+    --colour-warning: #946200;
+    --colour-warning-background: #fff8e5;
+
+    --colour-neutral-background: #eef1f5;
+
     --page-width: 1200px;
     --site-header-height: 4.5rem;
 

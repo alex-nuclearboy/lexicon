@@ -1,0 +1,32 @@
+{% extends "errors/base_error.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% translate "Page not found" %} | Vocabio
+{% endblock %}
+
+{% block error_modifier %}
+    error-page--neutral
+{% endblock %}
+
+{% block error_icon %}
+    ?
+{% endblock %}
+
+{% block error_code %}
+    {% translate "Error 404" %}
+{% endblock %}
+
+{% block error_title %}
+    {% translate "Page not found" %}
+{% endblock %}
+
+{% block error_description %}
+    {% translate "The page you are looking for does not exist or may have been moved." %}
+{% endblock %}
+
+{% block error_note %}
+    <p class="error-page__note">
+        {% translate "Check the address or return to the application home page." %}
+    </p>
+{% endblock %}

@@ -13,9 +13,10 @@
 {% endblock %}
 
 {% block content %}
-    <main class="error-page error-page--warning">
-        <section
+    <section class="error-page error-page--warning">
+        <div
             class="error-page__card"
+            role="alert"
             aria-labelledby="error-page-title"
             aria-describedby="error-page-description"
         >
@@ -60,12 +61,12 @@
 
             <div class="error-page__actions">
                 <a
-                    class="button button--secondary"
+                    class="error-page__link"
                     href="{% url 'accounts:login' %}"
                 >
                     {% translate "Return to sign in" %}
                 </a>
             </div>
-        </section>
-    </main>
+        </div>
+    </section>
 {% endblock %}

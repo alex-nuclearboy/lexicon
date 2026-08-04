@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/components/error-page.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <section
+        class="error-page {% block error_modifier %}error-page--error{% endblock %}"
+    >
+        <div
+            class="error-page__card"
+            aria-labelledby="error-page-title"
+            aria-describedby="error-page-description"
+        >
+            <div
+                class="error-page__icon"
+                aria-hidden="true"
+            >
+                {% block error_icon %}!{% endblock %}
+            </div>
+
+            <p class="error-page__code">
+                {% block error_code %}{% endblock %}
+            </p>
+
+            <h1
+                class="error-page__title"
+                id="error-page-title"
+            >
+                {% block error_title %}{% endblock %}
+            </h1>
+
+            <p
+                class="error-page__description"
+                id="error-page-description"
+            >
+                {% block error_description %}{% endblock %}
+            </p>
+
+            {% block error_message %}{% endblock %}
+
+            {% block error_note %}{% endblock %}
+
+            <div class="error-page__actions">
+                {% block error_actions %}
+                    <a
+                        class="error-page__link"
+                        href="{% url 'core:home' %}"
+                    >
+                        {% translate "Return to home" %}
+                    </a>
+                {% endblock %}
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "errors/base_error.html" %}
+{% load i18n %}
+
+{% block title %}
+    {% translate "Access denied" %} | Vocabio
+{% endblock %}
+
+{% block error_modifier %}
+    error-page--error
+{% endblock %}
+
+{% block error_icon %}
+    !
+{% endblock %}
+
+{% block error_code %}
+    {% translate "Error 403" %}
+{% endblock %}
+
+{% block error_title %}
+    {% translate "Access denied" %}
+{% endblock %}
+
+{% block error_description %}
+    {% translate "You do not have permission to access this page." %}
+{% endblock %}
+
+{% block error_note %}
+    <p class="error-page__note">
+        {% translate "Return to the application or sign in with an account that has the required access." %}
+    </p>
+{% endblock %}
