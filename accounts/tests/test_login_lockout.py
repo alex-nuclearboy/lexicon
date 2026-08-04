@@ -191,6 +191,33 @@ class LoginLockoutTests(TestCase):
             response,
             "accounts/login_lockout.html",
         )
+
+        self.assertContains(
+            response,
+            "Account temporarily locked",
+            status_code=429,
+        )
+        self.assertContains(
+            response,
+            "error-page--warning",
+            status_code=429,
+        )
+        self.assertContains(
+            response,
+            'class="error-page__link"',
+            status_code=429,
+        )
+        self.assertContains(
+            response,
+            "Return to sign in",
+            status_code=429,
+        )
+        self.assertNotContains(
+            response,
+            "button--secondary",
+            status_code=429,
+        )
+
         self.assertIn(
             "Retry-After",
             response.headers,
