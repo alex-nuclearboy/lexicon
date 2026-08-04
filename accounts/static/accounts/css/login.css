@@ -67,10 +67,6 @@
     place-items: center;
 
     border-radius: 1rem;
-
-    transition:
-        filter 180ms ease,
-        transform 180ms ease;
 }
 
 .login-card__logo {
@@ -78,19 +74,26 @@
     height: 3.5rem;
 
     object-fit: contain;
+
+    transition:
+        filter 180ms ease,
+        transform 180ms ease;
 }
 
-.login-card__logo-link:hover {
+.login-card__logo-link:hover .login-card__logo {
     filter:
         drop-shadow(
-            0 0 0.5rem rgb(var(--colour-brand-rgb) / 25%)
+            0 0 0.5rem
+            rgb(var(--colour-brand-rgb) / 25%)
         );
 
     transform: translateY(-1px) scale(1.015);
 }
 
 .login-card__logo-link:focus-visible {
-    outline: 3px solid rgb(var(--colour-brand-rgb) / 25%);
+    outline: 
+        3px solid
+        rgb(var(--colour-brand-rgb) / 25%);
     outline-offset: 4px;
 }
 
@@ -201,11 +204,11 @@
 
 
 @media (prefers-reduced-motion: reduce) {
-    .login-card__logo-link {
+    .login-card__logo {
         transition: none;
     }
 
-    .login-card__logo-link:hover {
+    .login-card__logo-link:hover .login-card__logo {
         transform: none;
     }
 }
