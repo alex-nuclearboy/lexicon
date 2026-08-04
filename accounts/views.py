@@ -139,11 +139,16 @@ def login_view(request: HttpRequest) -> HttpResponse:
             NON_FIELD_ERRORS,
             code="invalid_login",
         ):
-            audit_logger.warning(
-                "[AUTH|FAILED] Login attempt failed because "
-                "the credentials were invalid | ip=%s.",
-                get_client_ip(request),
-            )
+            if not getattr(
+                request,
+                "axes_locked_out",
+                False,
+            ):
+                audit_logger.warning(
+                    "[AUTH|FAILED] Login attempt failed because "
+                    "the credentials were invalid | ip=%s.",
+                    get_client_ip(request),
+                )
 
     return render(
         request,

@@ -9,6 +9,7 @@ platform variables take precedence in production.
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 from typing import Any
 
@@ -250,9 +251,65 @@ CSRF_COOKIE_SECURE = not DEBUG
 # Authentication
 # ---------------------------------------------------------------------------
 
+AUTHENTICATION_BACKENDS = [
+    "axes.backends.AxesStandaloneBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
 LOGIN_URL = "accounts:login"
 LOGIN_REDIRECT_URL = "core:home"
 LOGOUT_REDIRECT_URL = "core:home"
+
+# Store login attempts in the application database.
+AXES_HANDLER = (
+    "axes.handlers.database.AxesDatabaseHandler"
+)
+
+# Track and lock accounts globally by username.
+AXES_LOCKOUT_PARAMETERS = [
+    "username",
+]
+
+# Username-only lockout is intentional. IP-based lockout could affect
+# multiple users sharing the same public address.
+SILENCED_SYSTEM_CHECKS = [
+    "axes.W006",
+]
+
+# Lock the username after five failed authentication attempts.
+AXES_FAILURE_LIMIT = 5
+AXES_LOCK_OUT_AT_FAILURE = True
+
+# Allow authentication attempts again 15 minutes after lockout begins.
+AXES_COOLOFF_TIME = timedelta(
+    minutes=15,
+)
+
+# Keep the original lockout expiry when another attempt is made while
+# the username is already locked.
+AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
+
+# Clear accumulated failures after a successful authentication.
+AXES_RESET_ON_SUCCESS = True
+
+# Return a rate-limit response when authentication is blocked.
+AXES_HTTP_RESPONSE_CODE = 429
+
+# Render the styled lockout page.
+AXES_LOCKOUT_TEMPLATE = (
+    "accounts/login_lockout.html"
+)
+
+# Calculate the remaining wait time and add the Retry-After header
+# whenever a lockout response is generated.
+AXES_LOCKOUT_CALLABLE = (
+    "accounts.security.login_lockout_response"
+)
+
+# Do not duplicate client IP addresses in Axes database records.
+AXES_CLIENT_IP_CALLABLE = (
+    "accounts.security.discard_client_ip"
+)
 
 
 # ---------------------------------------------------------------------------
@@ -262,6 +319,7 @@ LOGOUT_REDIRECT_URL = "core:home"
 INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",
     "core.apps.CoreConfig",
+    "axes",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -280,6 +338,7 @@ MIDDLEWARE = [
     "core.middleware.ApplicationAccessMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "axes.middleware.AxesMiddleware",
 ]
 
 ROOT_URLCONF = "config.urls"

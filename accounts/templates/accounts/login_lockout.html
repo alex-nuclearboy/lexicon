@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load i18n static %}
+
+{% block title %}
+    {% translate "Account temporarily locked" %} | Vocabio
+{% endblock %}
+
+{% block extra_css %}
+    <link
+        rel="stylesheet"
+        href="{% static 'css/components/error-page.css' %}"
+    >
+{% endblock %}
+
+{% block content %}
+    <main class="error-page error-page--warning">
+        <section
+            class="error-page__card"
+            aria-labelledby="error-page-title"
+            aria-describedby="error-page-description"
+        >
+            <div
+                class="error-page__icon"
+                aria-hidden="true"
+            >
+                !
+            </div>
+
+            <p class="error-page__code">
+                {% translate "Temporary security lock" %}
+            </p>
+
+            <h1
+                class="error-page__title"
+                id="error-page-title"
+            >
+                {% translate "Account temporarily locked" %}
+            </h1>
+
+            <p
+                class="error-page__description"
+                id="error-page-description"
+            >
+                {% translate "Too many unsuccessful sign-in attempts were made for this account." %}
+            </p>
+
+            {% if retry_after_minutes %}
+                <p class="error-page__message">
+                    {% blocktranslate trimmed count minutes=retry_after_minutes %}
+                        Please try again in {{ minutes }} minute.
+                    {% plural %}
+                        Please try again in {{ minutes }} minutes.
+                    {% endblocktranslate %}
+                </p>
+            {% endif %}
+
+            <p class="error-page__note">
+                {% translate "Even the correct password cannot be used until the temporary lock expires." %}
+            </p>
+
+            <div class="error-page__actions">
+                <a
+                    class="button button--secondary"
+                    href="{% url 'accounts:login' %}"
+                >
+                    {% translate "Return to sign in" %}
+                </a>
+            </div>
+        </section>
+    </main>
+{% endblock %}
