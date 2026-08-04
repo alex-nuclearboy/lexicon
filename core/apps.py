@@ -1,5 +1,9 @@
+"""Application configuration for the core application."""
+
 from django.apps import AppConfig
 
 
 class CoreConfig(AppConfig):
-    name = 'core'
+    """Configure the core application."""
+
+    name = "core"

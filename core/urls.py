@@ -1,10 +1,12 @@
+"""URL configuration for the core application."""
+
 from django.urls import path
 
-from . import views
+from .views import home
 
 
-app_name = "core"
+app_name = "core"  # pylint: disable=invalid-name
 
 urlpatterns = [
-    path("", views.home, name="home"),
+    path("", home, name="home"),
 ]
