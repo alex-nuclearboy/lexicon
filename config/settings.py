@@ -216,10 +216,22 @@ ALLOWED_HOSTS = [
     if host.strip()
 ]
 
-koyeb_instance_id = os.getenv("KOYEB_INSTANCE_ID", "").strip()
+koyeb_instance_id = os.getenv(
+    "KOYEB_INSTANCE_ID",
+    "",
+).strip()
 
-if koyeb_instance_id:
+if (
+    koyeb_instance_id
+    and koyeb_instance_id not in ALLOWED_HOSTS
+):
     ALLOWED_HOSTS.append(koyeb_instance_id)
+
+# Redirect HTTP requests to HTTPS when enabled by the environment.
+SECURE_SSL_REDIRECT = get_bool_env(
+    "SECURE_SSL_REDIRECT",
+    default=False,
+)
 
 # Production cookies are transmitted only over HTTPS.
 SESSION_COOKIE_SECURE = not DEBUG
