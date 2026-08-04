@@ -91,7 +91,11 @@ def login_view(request: HttpRequest) -> HttpResponse:
 
     form = ApplicationLoginForm(
         request=request,
-        data=request.POST or None,
+        data=(
+            request.POST
+            if request.method == "POST"
+            else None
+        ),
     )
 
     if request.method == "POST":

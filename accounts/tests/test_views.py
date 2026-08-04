@@ -110,6 +110,46 @@ class AuthenticationViewTests(TestCase):
         )
         self.assertIn("form", response.context)
 
+    def test_empty_login_submission_shows_required_errors(
+        self,
+    ) -> None:
+        """Show field errors when the login form is submitted empty."""
+        response = self.client.post(
+            self.login_url,
+            {},
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn(
+            "_auth_user_id",
+            self.client.session,
+        )
+
+        form = response.context["form"]
+
+        self.assertTrue(form.is_bound)
+        self.assertTrue(
+            form.has_error(
+                "username",
+                code="required",
+            )
+        )
+        self.assertTrue(
+            form.has_error(
+                "password",
+                code="required",
+            )
+        )
+
+        self.assertContains(
+            response,
+            "Enter your username.",
+        )
+        self.assertContains(
+            response,
+            "Enter your password.",
+        )
+
     def test_login_rejects_unsupported_http_methods(
         self,
     ) -> None:
