@@ -4,7 +4,13 @@ import logging
 
 from django.conf import settings
 from django.contrib import messages
-from django.contrib.auth import REDIRECT_FIELD_NAME, login, logout
+from django.contrib.auth import (
+    REDIRECT_FIELD_NAME,
+    login,
+    logout,
+    update_session_auth_hash,
+)
+from django.contrib.auth.decorators import login_required
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.http import HttpRequest, HttpResponse
 from django.shortcuts import redirect, render
@@ -20,8 +26,15 @@ from django.views.decorators.http import (
 from core.utils import get_client_ip
 
 from .access import can_access_application
-from .forms import ApplicationLoginForm
-from .ui_messages import LOGIN_SUCCESSFUL, LOGOUT_SUCCESSFUL
+from .forms import (
+    ApplicationLoginForm,
+    ApplicationPasswordChangeForm,
+)
+from .ui_messages import (
+    LOGIN_SUCCESSFUL,
+    LOGOUT_SUCCESSFUL,
+    PASSWORD_CHANGE_SUCCESSFUL,
+)
 
 
 audit_logger = logging.getLogger(
@@ -113,10 +126,14 @@ def login_view(request: HttpRequest) -> HttpResponse:
                     get_client_ip(request),
                 )
 
-                messages.success(request, LOGIN_SUCCESSFUL)
+                messages.success(
+                    request,
+                    LOGIN_SUCCESSFUL,
+                )
 
                 return redirect(
-                    redirect_url or settings.LOGIN_REDIRECT_URL
+                    redirect_url
+                    or settings.LOGIN_REDIRECT_URL
                 )
 
         elif form.has_error(
@@ -135,6 +152,67 @@ def login_view(request: HttpRequest) -> HttpResponse:
         {
             "form": form,
             REDIRECT_FIELD_NAME: redirect_url or "",
+        },
+    )
+
+
+@sensitive_post_parameters()
+@never_cache
+@require_http_methods(["GET", "POST"])
+@csrf_protect
+@login_required
+def password_change_view(
+    request: HttpRequest,
+) -> HttpResponse:
+    """Allow an authenticated user to change their own password.
+
+    Args:
+        request: The current HTTP request.
+
+    Returns:
+        A redirect after a successful password change or the rendered
+        password change form.
+    """
+    form = ApplicationPasswordChangeForm(
+        user=request.user,
+        data=(
+            request.POST
+            if request.method == "POST"
+            else None
+        ),
+    )
+
+    if request.method == "POST" and form.is_valid():
+        user = form.save()
+
+        update_session_auth_hash(
+            request,
+            user,
+        )
+
+        audit_logger.info(
+            "[AUTH|PASSWORD_CHANGE] User changed their "
+            "password successfully | username=%s | "
+            "user_id=%s | ip=%s.",
+            user.get_username(),
+            user.pk,
+            get_client_ip(request),
+        )
+
+        messages.success(
+            request,
+            PASSWORD_CHANGE_SUCCESSFUL,
+        )
+
+        return redirect(
+            settings.LOGIN_REDIRECT_URL
+        )
+
+    return render(
+        request,
+        "accounts/password_change.html",
+        {
+            "form": form,
         },
     )
 
@@ -174,6 +252,11 @@ def logout_view(request: HttpRequest) -> HttpResponse:
             client_ip,
         )
 
-    messages.success(request, LOGOUT_SUCCESSFUL)
+    messages.success(
+        request,
+        LOGOUT_SUCCESSFUL,
+    )
 
-    return redirect(settings.LOGOUT_REDIRECT_URL)
+    return redirect(
+        settings.LOGOUT_REDIRECT_URL
+    )

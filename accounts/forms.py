@@ -4,7 +4,7 @@ import logging
 
 from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser
-from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.forms import AuthenticationForm, PasswordChangeForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
@@ -94,3 +94,59 @@ class ApplicationLoginForm(AuthenticationForm):
                 self.error_messages["access_denied"],
                 code="access_denied",
             )
+
+
+class ApplicationPasswordChangeForm(PasswordChangeForm):
+    """Allow a user to change their own password."""
+
+    def __init__(
+        self,
+        *args,
+        **kwargs,
+    ) -> None:
+        """Configure password fields for the application interface."""
+        super().__init__(*args, **kwargs)
+
+        old_password = self.fields["old_password"]
+        old_password.label = _("Current password")
+        old_password.error_messages["required"] = _(
+            "Current password is required."
+        )
+        old_password.widget.attrs.update(
+            {
+                "class": "form-control",
+                "autocomplete": "current-password",
+                "autofocus": True,
+                "placeholder": _(
+                    "Enter your current password"
+                ),
+            }
+        )
+
+        new_password1 = self.fields["new_password1"]
+        new_password1.label = _("New password")
+        new_password1.error_messages["required"] = _(
+            "New password is required."
+        )
+        new_password1.widget.attrs.update(
+            {
+                "class": "form-control",
+                "autocomplete": "new-password",
+                "placeholder": _("Enter a new password"),
+            }
+        )
+
+        new_password2 = self.fields["new_password2"]
+        new_password2.label = _("Confirm new password")
+        new_password2.error_messages["required"] = _(
+            "Password confirmation is required."
+        )
+        new_password2.widget.attrs.update(
+            {
+                "class": "form-control",
+                "autocomplete": "new-password",
+                "placeholder": _(
+                    "Enter the new password again"
+                ),
+            }
+        )

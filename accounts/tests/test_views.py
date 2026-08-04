@@ -16,12 +16,17 @@ from accounts.ui_messages import (
     APPLICATION_ACCESS_DENIED,
     LOGIN_SUCCESSFUL,
     LOGOUT_SUCCESSFUL,
+    PASSWORD_CHANGE_SUCCESSFUL,
 )
 
 
 User = get_user_model()
 
 TEST_PASSWORD = "A-secure-test-password-123!"
+
+TEST_CHANGE_PASSWORD = (
+    "Another-secure-test-password-456!"
+)
 
 TEST_STORAGES = {
     "default": {
@@ -589,3 +594,301 @@ class AuthenticationViewTests(TestCase):
             "_auth_user_id",
             csrf_client.session,
         )
+
+
+@override_settings(STORAGES=TEST_STORAGES)
+class PasswordChangeViewTests(TestCase):
+    """Verify self-service password change behaviour."""
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        """Create a user with application access."""
+        content_type = ContentType.objects.get_for_model(
+            ApplicationAccess,
+            for_concrete_model=False,
+        )
+        access_permission = Permission.objects.get(
+            content_type=content_type,
+            codename="access_application",
+        )
+
+        cls.user = User.objects.create_user(
+            username="password-member",
+            password=TEST_PASSWORD,
+        )
+        cls.user.user_permissions.add(
+            access_permission
+        )
+
+    def setUp(self) -> None:
+        """Resolve URLs used by password change tests."""
+        self.password_change_url = reverse(
+            "accounts:password_change"
+        )
+        self.login_url = reverse(
+            "accounts:login"
+        )
+        self.home_url = reverse(
+            "core:home"
+        )
+
+    def test_password_change_requires_authentication(
+        self,
+    ) -> None:
+        """Redirect an anonymous user to the login page."""
+        response = self.client.get(
+            self.password_change_url
+        )
+
+        self.assertRedirects(
+            response,
+            (
+                f"{self.login_url}"
+                f"?next={self.password_change_url}"
+            ),
+            fetch_redirect_response=False,
+        )
+
+    def test_password_change_page_is_available(
+        self,
+    ) -> None:
+        """Render the password change form for an authorised user."""
+        self.client.force_login(self.user)
+
+        response = self.client.get(
+            self.password_change_url
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+        self.assertTemplateUsed(
+            response,
+            "accounts/password_change.html",
+        )
+        self.assertIn(
+            "form",
+            response.context,
+        )
+        self.assertEqual(
+            response.context["form"].user,
+            self.user,
+        )
+
+    def test_valid_password_change_updates_password(
+        self,
+    ) -> None:
+        """Change the password and preserve the current session."""
+        self.client.force_login(self.user)
+
+        with self.assertLogs(
+            "vocabio.audit.accounts.views",
+            level="INFO",
+        ) as captured_logs:
+            response = self.client.post(
+                self.password_change_url,
+                {
+                    "old_password": TEST_PASSWORD,
+                    "new_password1": TEST_CHANGE_PASSWORD,
+                    "new_password2": TEST_CHANGE_PASSWORD,
+                },
+            )
+
+        self.assertRedirects(
+            response,
+            self.home_url,
+            fetch_redirect_response=False,
+        )
+
+        self.user.refresh_from_db()
+
+        self.assertFalse(
+            self.user.check_password(
+                TEST_PASSWORD
+            )
+        )
+        self.assertTrue(
+            self.user.check_password(
+                TEST_CHANGE_PASSWORD
+            )
+        )
+
+        self.assertEqual(
+            self.client.session.get(
+                "_auth_user_id"
+            ),
+            str(self.user.pk),
+        )
+
+        self.assertEqual(
+            len(captured_logs.output),
+            1,
+        )
+        self.assertIn(
+            "[AUTH|PASSWORD_CHANGE]",
+            captured_logs.output[0],
+        )
+        self.assertIn(
+            "username=password-member",
+            captured_logs.output[0],
+        )
+        self.assertIn(
+            f"user_id={self.user.pk}",
+            captured_logs.output[0],
+        )
+        self.assertIn(
+            "ip=127.0.0.1",
+            captured_logs.output[0],
+        )
+        self.assertNotIn(
+            TEST_PASSWORD,
+            captured_logs.output[0],
+        )
+        self.assertNotIn(
+            TEST_CHANGE_PASSWORD,
+            captured_logs.output[0],
+        )
+
+        message_texts = [
+            str(message)
+            for message in get_messages(
+                response.wsgi_request
+            )
+        ]
+
+        self.assertIn(
+            str(PASSWORD_CHANGE_SUCCESSFUL),
+            message_texts,
+        )
+
+    def test_incorrect_current_password_is_rejected(
+        self,
+    ) -> None:
+        """Reject a password change with an incorrect current password."""
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            self.password_change_url,
+            {
+                "old_password": "incorrect-password",
+                "new_password1": TEST_CHANGE_PASSWORD,
+                "new_password2": TEST_CHANGE_PASSWORD,
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        form = response.context["form"]
+
+        self.assertTrue(
+            form.has_error("old_password")
+        )
+
+        self.user.refresh_from_db()
+
+        self.assertTrue(
+            self.user.check_password(
+                TEST_PASSWORD
+            )
+        )
+        self.assertFalse(
+            self.user.check_password(
+                TEST_CHANGE_PASSWORD
+            )
+        )
+
+    def test_mismatched_new_passwords_are_rejected(
+        self,
+    ) -> None:
+        """Reject new password values that do not match."""
+        self.client.force_login(self.user)
+
+        response = self.client.post(
+            self.password_change_url,
+            {
+                "old_password": TEST_PASSWORD,
+                "new_password1": TEST_CHANGE_PASSWORD,
+                "new_password2": (
+                    "Different-secure-password-789!"
+                ),
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+
+        form = response.context["form"]
+
+        self.assertTrue(
+            form.has_error("new_password2")
+        )
+
+        self.user.refresh_from_db()
+
+        self.assertTrue(
+            self.user.check_password(
+                TEST_PASSWORD
+            )
+        )
+
+    def test_password_change_requires_csrf_token(
+        self,
+    ) -> None:
+        """Reject password changes without a CSRF token."""
+        csrf_client = Client(
+            enforce_csrf_checks=True
+        )
+        csrf_client.force_login(self.user)
+
+        response = csrf_client.post(
+            self.password_change_url,
+            {
+                "old_password": TEST_PASSWORD,
+                "new_password1": TEST_CHANGE_PASSWORD,
+                "new_password2": TEST_CHANGE_PASSWORD,
+            },
+        )
+
+        self.assertEqual(
+            response.status_code,
+            403,
+        )
+
+        self.user.refresh_from_db()
+
+        self.assertTrue(
+            self.user.check_password(
+                TEST_PASSWORD
+            )
+        )
+
+    def test_password_change_rejects_unsupported_methods(
+        self,
+    ) -> None:
+        """Allow only GET and POST password change requests."""
+        self.client.force_login(self.user)
+
+        requests = (
+            self.client.put,
+            self.client.patch,
+            self.client.delete,
+        )
+
+        for request_method in requests:
+            with self.subTest(
+                method=request_method.__name__.upper(),
+            ):
+                response = request_method(
+                    self.password_change_url
+                )
+
+                self.assertEqual(
+                    response.status_code,
+                    405,
+                )
