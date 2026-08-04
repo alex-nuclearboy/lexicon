@@ -595,66 +595,65 @@ class AuthenticationViewTests(TestCase):
             csrf_client.session,
         )
 
-        def test_authenticated_header_contains_account_menu(
-            self,
-        ) -> None:
-            """Show account actions to an authenticated user."""
-            self.client.force_login(self.allowed_user)
+    def test_authenticated_header_contains_account_menu(
+        self,
+    ) -> None:
+        """Show account actions to an authenticated user."""
+        self.client.force_login(self.allowed_user)
 
-            response = self.client.get(self.home_url)
+        response = self.client.get(self.home_url)
 
-            self.assertEqual(
-                response.status_code,
-                200,
-            )
-            self.assertContains(
-                response,
-                "data-header-menu-toggle",
-            )
-            self.assertContains(
-                response,
-                reverse("accounts:password_change"),
-            )
-            self.assertContains(
-                response,
-                reverse("accounts:logout"),
-            )
-            self.assertContains(
-                response,
-                "Change password",
-            )
-            self.assertContains(
-                response,
-                "Log out",
-            )
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+        self.assertContains(
+            response,
+            "data-header-menu-toggle",
+        )
+        self.assertContains(
+            response,
+            reverse("accounts:password_change"),
+        )
+        self.assertContains(
+            response,
+            reverse("accounts:logout"),
+        )
+        self.assertContains(
+            response,
+            "Change password",
+        )
+        self.assertContains(
+            response,
+            "Log out",
+        )
 
+    def test_anonymous_header_hides_account_menu(
+        self,
+    ) -> None:
+        """Hide authenticated account actions from anonymous users."""
+        response = self.client.get(self.home_url)
 
-        def test_anonymous_header_hides_account_menu(
-            self,
-        ) -> None:
-            """Hide authenticated account actions from anonymous users."""
-            response = self.client.get(self.home_url)
-
-            self.assertEqual(
-                response.status_code,
-                200,
-            )
-            self.assertNotContains(
-                response,
-                "data-header-menu-toggle",
-            )
-            self.assertNotContains(
-                response,
-                reverse("accounts:password_change"),
-            )
-            self.assertContains(
-                response,
-                reverse("accounts:login"),
-            )
-            self.assertContains(
-                response,
-                "Log in",
-            )
+        self.assertEqual(
+            response.status_code,
+            200,
+        )
+        self.assertNotContains(
+            response,
+            "data-header-menu-toggle",
+        )
+        self.assertNotContains(
+            response,
+            reverse("accounts:password_change"),
+        )
+        self.assertContains(
+            response,
+            reverse("accounts:login"),
+        )
+        self.assertContains(
+            response,
+            "Log in",
+        )
 
 
 @override_settings(STORAGES=TEST_STORAGES)
