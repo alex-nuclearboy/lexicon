@@ -1,15 +1,16 @@
 """Authentication forms for the accounts application."""
 
 import logging
+
 from django import forms
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 
-from core.utils import get_client_ip
 from accounts.access import can_access_application
 from accounts.ui_messages import APPLICATION_ACCESS_DENIED
+from core.utils import get_client_ip
 
 
 audit_logger = logging.getLogger(
