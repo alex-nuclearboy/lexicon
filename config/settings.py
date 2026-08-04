@@ -212,20 +212,28 @@ DEBUG = get_bool_env(
 # Multiple hosts are supplied as a comma-separated environment variable.
 ALLOWED_HOSTS = [
     host.strip()
-    for host in os.getenv("DJANGO_ALLOWED_HOSTS", "").split(",")
+    for host in os.getenv(
+        "DJANGO_ALLOWED_HOSTS",
+        "",
+    ).split(",")
     if host.strip()
 ]
 
-koyeb_instance_id = os.getenv(
+# Allow internal Koyeb requests addressed by a platform identifier.
+for environment_name in (
+    "KOYEB_SERVICE_ID",
     "KOYEB_INSTANCE_ID",
-    "",
-).strip()
-
-if (
-    koyeb_instance_id
-    and koyeb_instance_id not in ALLOWED_HOSTS
 ):
-    ALLOWED_HOSTS.append(koyeb_instance_id)
+    koyeb_internal_host = os.getenv(
+        environment_name,
+        "",
+    ).strip()
+
+    if (
+        koyeb_internal_host
+        and koyeb_internal_host not in ALLOWED_HOSTS
+    ):
+        ALLOWED_HOSTS.append(koyeb_internal_host)
 
 # Redirect HTTP requests to HTTPS when enabled by the environment.
 SECURE_SSL_REDIRECT = get_bool_env(
