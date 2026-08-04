@@ -1,1 +1,1 @@
-"""Django Admin configuration for the accounts application."""
+"""Django Admin configuration for the core application."""
