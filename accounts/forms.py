@@ -12,10 +12,7 @@ from accounts.access import can_access_application
 from accounts.ui_messages import APPLICATION_ACCESS_DENIED
 from core.utils import get_client_ip
 
-
-audit_logger = logging.getLogger(
-    f"vocabio.audit.{__name__}"
-)
+audit_logger = logging.getLogger(f"vocabio.audit.{__name__}")
 
 
 class ApplicationLoginForm(AuthenticationForm):
@@ -117,9 +114,7 @@ class ApplicationPasswordChangeForm(PasswordChangeForm):
                 "class": "form-control",
                 "autocomplete": "current-password",
                 "autofocus": True,
-                "placeholder": _(
-                    "Enter your current password"
-                ),
+                "placeholder": _("Enter your current password"),
             }
         )
 
@@ -145,8 +140,6 @@ class ApplicationPasswordChangeForm(PasswordChangeForm):
             {
                 "class": "form-control",
                 "autocomplete": "new-password",
-                "placeholder": _(
-                    "Enter the new password again"
-                ),
+                "placeholder": _("Enter the new password again"),
             }
         )

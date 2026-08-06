@@ -17,17 +17,14 @@ from django.utils import timezone
 
 from core.utils import get_client_ip
 
-
-audit_logger = logging.getLogger(
-    "vocabio.audit.accounts.security"
-)
+audit_logger = logging.getLogger("vocabio.audit.accounts.security")
 
 
 def resolve_axes_client_ip(
     request: HttpRequest,
 ) -> str | None:
     """Return a database-safe client IP for Axes.
-    
+
     Convert the ``"unknown"`` sentinel from ``get_client_ip`` to ``None``
 
     Args:
@@ -68,9 +65,7 @@ def login_lockout_response(
     retry_after_seconds = 0
 
     if cool_off is not None:
-        retry_after_seconds = ceil(
-            cool_off.total_seconds()
-        )
+        retry_after_seconds = ceil(cool_off.total_seconds())
 
         if username:
             access_attempts = (
@@ -91,16 +86,13 @@ def login_lockout_response(
             )
 
             if latest_attempt_time is not None:
-                lockout_expires_at = (
-                    latest_attempt_time + cool_off
-                )
+                lockout_expires_at = latest_attempt_time + cool_off
 
                 retry_after_seconds = max(
                     1,
                     ceil(
                         (
-                            lockout_expires_at
-                            - timezone.now()
+                            lockout_expires_at - timezone.now()
                         ).total_seconds()
                     ),
                 )
@@ -136,19 +128,13 @@ def login_lockout_response(
                 credentials,
             ),
             "username": username,
-            "retry_after_seconds": (
-                retry_after_seconds
-            ),
-            "retry_after_minutes": (
-                retry_after_minutes
-            ),
+            "retry_after_seconds": retry_after_seconds,
+            "retry_after_minutes": retry_after_minutes,
         },
         status=settings.AXES_HTTP_RESPONSE_CODE,
     )
 
     if retry_after_seconds:
-        response.headers["Retry-After"] = str(
-            retry_after_seconds
-        )
+        response.headers["Retry-After"] = str(retry_after_seconds)
 
     return response

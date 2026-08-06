@@ -1,5 +1,6 @@
 """Models and model-level permissions for the accounts application."""
 
+# pylint: disable-next=imported-auth-user
 from django.contrib.auth.models import User
 from django.utils.translation import gettext_lazy as _
 
@@ -9,6 +10,7 @@ class ApplicationPermissions(User):
 
     class Meta:  # pylint: disable=too-few-public-methods
         """Configure the application access proxy model."""
+
         proxy = True
         default_permissions = ()
         permissions = [

@@ -36,9 +36,7 @@ from .ui_messages import (
     PASSWORD_CHANGE_SUCCESSFUL,
 )
 
-audit_logger = logging.getLogger(
-    f"vocabio.audit.{__name__}"
-)
+audit_logger = logging.getLogger(f"vocabio.audit.{__name__}")
 
 
 def _get_safe_redirect_url(
@@ -98,7 +96,8 @@ def login_view(request: HttpRequest) -> HttpResponse:
         and can_access_application(request.user)
     ):
         return redirect(
-            redirect_url or settings.LOGIN_REDIRECT_URL
+            redirect_url
+            or settings.LOGIN_REDIRECT_URL
         )
 
     form = ApplicationLoginForm(
@@ -208,9 +207,7 @@ def password_change_view(
             PASSWORD_CHANGE_SUCCESSFUL,
         )
 
-        return redirect(
-            settings.LOGIN_REDIRECT_URL
-        )
+        return redirect(settings.LOGIN_REDIRECT_URL)
 
     return render(
         request,
@@ -261,6 +258,4 @@ def logout_view(request: HttpRequest) -> HttpResponse:
         LOGOUT_SUCCESSFUL,
     )
 
-    return redirect(
-        settings.LOGOUT_REDIRECT_URL
-    )
+    return redirect(settings.LOGOUT_REDIRECT_URL)

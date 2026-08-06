@@ -11,6 +11,4 @@ LOGIN_SUCCESSFUL = _("You have signed in successfully.")
 
 LOGOUT_SUCCESSFUL = _("You have signed out successfully.")
 
-PASSWORD_CHANGE_SUCCESSFUL = _(
-    "Your password has been changed successfully."
-)
+PASSWORD_CHANGE_SUCCESSFUL = _("Your password has been changed successfully.")

@@ -8,7 +8,6 @@ application permission.
 from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import AnonymousUser
 
-
 APPLICATION_ACCESS_PERMISSION = "accounts.access_application"
 
 UserType = AbstractBaseUser | AnonymousUser

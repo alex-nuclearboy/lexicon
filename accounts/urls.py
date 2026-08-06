@@ -8,7 +8,6 @@ from .views import (
     password_change_view,
 )
 
-
 app_name = "accounts"  # pylint: disable=invalid-name
 
 urlpatterns = [
