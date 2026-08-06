@@ -17,7 +17,7 @@ from django.utils import timezone
 
 from core.utils import get_client_ip
 
-audit_logger = logging.getLogger("vocabio.audit.accounts.security")
+audit_logger = logging.getLogger(f"vocabio.audit.{__name__}")
 
 
 def resolve_axes_client_ip(
