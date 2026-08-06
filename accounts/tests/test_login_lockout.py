@@ -6,33 +6,19 @@ from math import ceil
 from axes.models import AccessAttempt
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.http import HttpResponse
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from accounts.models import ApplicationPermissions
-
+from accounts.tests.helpers import (
+    TEST_STORAGES,
+    get_application_access_permission,
+)
 
 User = get_user_model()
 
 TEST_PASSWORD = "Secure-test-password-123!"
 WRONG_PASSWORD = "Incorrect-test-password-456!"
-
-TEST_STORAGES = {
-    "default": {
-        "BACKEND": (
-            "django.core.files.storage.FileSystemStorage"
-        ),
-    },
-    "staticfiles": {
-        "BACKEND": (
-            "django.contrib.staticfiles.storage."
-            "StaticFilesStorage"
-        ),
-    },
-}
 
 
 @override_settings(STORAGES=TEST_STORAGES)
@@ -42,14 +28,7 @@ class LoginLockoutTests(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         """Create users with application access."""
-        content_type = ContentType.objects.get_for_model(
-            ApplicationPermissions,
-            for_concrete_model=False,
-        )
-        access_permission = Permission.objects.get(
-            content_type=content_type,
-            codename="access_application",
-        )
+        access_permission = get_application_access_permission()
 
         cls.user = User.objects.create_user(
             username="lockout-member",

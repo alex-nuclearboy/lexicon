@@ -4,19 +4,20 @@ from django.contrib.auth import (
     REDIRECT_FIELD_NAME,
     get_user_model,
 )
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.contrib.messages import get_messages
 from django.core.exceptions import NON_FIELD_ERRORS
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from accounts.models import ApplicationPermissions
 from accounts.ui_messages import (
     APPLICATION_ACCESS_DENIED,
     LOGIN_SUCCESSFUL,
     LOGOUT_SUCCESSFUL,
     PASSWORD_CHANGE_SUCCESSFUL,
+)
+from accounts.tests.helpers import (
+    TEST_STORAGES,
+    get_application_access_permission,
 )
 
 
@@ -28,35 +29,16 @@ TEST_CHANGE_PASSWORD = (
     "Another-secure-test-password-456!"
 )
 
-TEST_STORAGES = {
-    "default": {
-        "BACKEND": (
-            "django.core.files.storage.FileSystemStorage"
-        ),
-    },
-    "staticfiles": {
-        "BACKEND": (
-            "django.contrib.staticfiles.storage.StaticFilesStorage"
-        ),
-    },
-}
-
 
 @override_settings(STORAGES=TEST_STORAGES)
+# pylint: disable-next=too-many-public-methods
 class AuthenticationViewTests(TestCase):
     """Verify login and logout behaviour through real HTTP requests."""
 
     @classmethod
     def setUpTestData(cls) -> None:
         """Create reusable accounts and the application permission."""
-        content_type = ContentType.objects.get_for_model(
-            ApplicationPermissions,
-            for_concrete_model=False,
-        )
-        access_permission = Permission.objects.get(
-            content_type=content_type,
-            codename="access_application",
-        )
+        access_permission = get_application_access_permission()
 
         cls.allowed_user = User.objects.create_user(
             username="member",
@@ -663,14 +645,7 @@ class PasswordChangeViewTests(TestCase):
     @classmethod
     def setUpTestData(cls) -> None:
         """Create a user with application access."""
-        content_type = ContentType.objects.get_for_model(
-            ApplicationPermissions,
-            for_concrete_model=False,
-        )
-        access_permission = Permission.objects.get(
-            content_type=content_type,
-            codename="access_application",
-        )
+        access_permission = get_application_access_permission()
 
         cls.user = User.objects.create_user(
             username="password-member",
