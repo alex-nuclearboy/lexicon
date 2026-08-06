@@ -2,7 +2,7 @@
 
 from django.urls import path
 
-from .views import home
+from core.views import home
 
 app_name = "core"  # pylint: disable=invalid-name
 

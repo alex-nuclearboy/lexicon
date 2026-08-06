@@ -16,7 +16,7 @@ import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
-from .logging import build_logging_config
+from config.logging import build_logging_config
 
 
 # ---------------------------------------------------------------------------

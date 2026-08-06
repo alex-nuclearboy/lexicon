@@ -25,12 +25,12 @@ from django.views.decorators.http import (
 
 from core.utils import get_client_ip
 
-from .access import can_access_application
-from .forms import (
+from accounts.access import can_access_application
+from accounts.forms import (
     ApplicationLoginForm,
     ApplicationPasswordChangeForm,
 )
-from .ui_messages import (
+from accounts.ui_messages import (
     LOGIN_SUCCESSFUL,
     LOGOUT_SUCCESSFUL,
     PASSWORD_CHANGE_SUCCESSFUL,
