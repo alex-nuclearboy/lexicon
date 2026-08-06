@@ -12,7 +12,7 @@ from django.http import HttpResponse
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from accounts.models import ApplicationAccess
+from accounts.models import ApplicationPermissions
 
 
 User = get_user_model()
@@ -43,7 +43,7 @@ class LoginLockoutTests(TestCase):
     def setUpTestData(cls) -> None:
         """Create users with application access."""
         content_type = ContentType.objects.get_for_model(
-            ApplicationAccess,
+            ApplicationPermissions,
             for_concrete_model=False,
         )
         access_permission = Permission.objects.get(

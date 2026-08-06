@@ -8,7 +8,7 @@ from django.http import HttpRequest, HttpResponse
 from django.test import TestCase, override_settings
 from django.urls import include, path, reverse
 
-from accounts.models import ApplicationAccess
+from accounts.models import ApplicationPermissions
 
 
 User = get_user_model()
@@ -66,14 +66,14 @@ urlpatterns = [
     ROOT_URLCONF=__name__,
     STORAGES=TEST_STORAGES,
 )
-class ApplicationAccessMiddlewareTests(TestCase):
+class ApplicationPermissionsMiddlewareTests(TestCase):
     """Verify application-wide access control through real requests."""
 
     @classmethod
     def setUpTestData(cls) -> None:
         """Create reusable accounts and the application permission."""
         content_type = ContentType.objects.get_for_model(
-            ApplicationAccess,
+            ApplicationPermissions,
             for_concrete_model=False,
         )
         cls.access_permission = Permission.objects.get(

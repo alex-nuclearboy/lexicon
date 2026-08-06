@@ -11,7 +11,7 @@ from django.core.exceptions import NON_FIELD_ERRORS
 from django.test import Client, TestCase, override_settings
 from django.urls import reverse
 
-from accounts.models import ApplicationAccess
+from accounts.models import ApplicationPermissions
 from accounts.ui_messages import (
     APPLICATION_ACCESS_DENIED,
     LOGIN_SUCCESSFUL,
@@ -50,7 +50,7 @@ class AuthenticationViewTests(TestCase):
     def setUpTestData(cls) -> None:
         """Create reusable accounts and the application permission."""
         content_type = ContentType.objects.get_for_model(
-            ApplicationAccess,
+            ApplicationPermissions,
             for_concrete_model=False,
         )
         access_permission = Permission.objects.get(
@@ -664,7 +664,7 @@ class PasswordChangeViewTests(TestCase):
     def setUpTestData(cls) -> None:
         """Create a user with application access."""
         content_type = ContentType.objects.get_for_model(
-            ApplicationAccess,
+            ApplicationPermissions,
             for_concrete_model=False,
         )
         access_permission = Permission.objects.get(

@@ -6,20 +6,20 @@ from django.contrib.contenttypes.models import ContentType
 from django.test import TestCase
 
 from accounts.access import can_access_application
-from accounts.models import ApplicationAccess
+from accounts.models import ApplicationPermissions
 
 
 User = get_user_model()
 
 
-class ApplicationAccessPolicyTests(TestCase):
+class ApplicationPermissionsPolicyTests(TestCase):
     """Verify every supported path through the access policy."""
 
     @classmethod
     def setUpTestData(cls) -> None:
         """Create reusable users and the custom application permission."""
         content_type = ContentType.objects.get_for_model(
-            ApplicationAccess,
+            ApplicationPermissions,
             for_concrete_model=False,
         )
         cls.access_permission = Permission.objects.get(
