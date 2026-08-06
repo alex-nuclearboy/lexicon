@@ -1,3 +1,14 @@
+[project]
+name = "vocabio"
+version = "0.1.0"
+description = "A personal vocabulary project for learning and organising English words"
+authors = [
+    { name = "Alex", email = "alex.nuclearboy@gmail.com" },
+]
+license = "Apache-2.0"
+readme = "README.md"
+dynamic = ["dependencies"]
+
 [tool.poetry]
 package-mode = false
 
