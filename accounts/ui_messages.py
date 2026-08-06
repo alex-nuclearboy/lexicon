@@ -2,7 +2,6 @@
 
 from django.utils.translation import gettext_lazy as _
 
-
 APPLICATION_ACCESS_DENIED = _(
     "This account does not have access to the application."
 )
