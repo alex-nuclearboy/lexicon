@@ -13,7 +13,6 @@ from accounts.access import can_access_application
 from accounts.ui_messages import APPLICATION_ACCESS_DENIED
 from core.utils import get_client_ip
 
-
 GetResponse = Callable[[HttpRequest], HttpResponse]
 
 logger = logging.getLogger(
@@ -23,7 +22,6 @@ logger = logging.getLogger(
 audit_logger = logging.getLogger(
     f"vocabio.audit.{__name__}"
 )
-
 
 # Named URL patterns that bypass the application access check.
 #
@@ -38,13 +36,13 @@ EXEMPT_URL_NAMES = frozenset(
     }
 )
 
-
 # Django Admin manages its own authentication and staff permissions.
 EXEMPT_PATH_PREFIXES = (
     "/admin/",
 )
 
 
+# pylint: disable-next=too-few-public-methods
 class ApplicationAccessMiddleware:
     """Protect application views with the central access policy.
 

@@ -10,7 +10,6 @@ from django.urls import include, path, reverse
 
 from accounts.models import ApplicationPermissions
 
-
 User = get_user_model()
 
 TEST_STORAGES = {
