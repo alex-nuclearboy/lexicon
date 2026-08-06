@@ -15,16 +15,12 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
+from core.utils import get_client_ip
+
 
 audit_logger = logging.getLogger(
     "vocabio.audit.accounts.security"
 )
-
-
-def discard_client_ip(
-    _request: HttpRequest,
-) -> None:
-    """Exclude client IP addresses from username-only lockout records."""
 
 
 def login_lockout_response(
@@ -49,6 +45,7 @@ def login_lockout_response(
         )
         or ""
     )
+    client_ip = get_client_ip(request)
     cool_off = get_cool_off(request)
 
     retry_after_seconds = 0
@@ -66,6 +63,7 @@ def login_lockout_response(
             latest_attempt_time = (
                 access_attempts.filter(
                     username=username,
+                    ip_address=client_ip,
                 )
                 .order_by("-attempt_time")
                 .values_list(
@@ -100,9 +98,11 @@ def login_lockout_response(
     )
 
     audit_logger.warning(
-        "[AUTH|LOCKOUT] Login attempt blocked because the username is "
-        "temporarily locked | username=%s | retry_after_seconds=%s.",
+        "[AUTH|LOCKOUT] Login attempt blocked because the username and IP "
+        "address are temporarily locked | username=%s | ip_address=%s | "
+        "retry_after_seconds=%s.",
         username or "<unknown>",
+        client_ip or "<unknown>",
         (
             retry_after_seconds
             if retry_after_seconds is not None

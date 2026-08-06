@@ -269,18 +269,12 @@ AXES_HANDLER = (
     "axes.handlers.database.AxesDatabaseHandler"
 )
 
-# Track and lock accounts globally by username.
+# Track and lock login attempts by username and IP address.
 AXES_LOCKOUT_PARAMETERS = [
-    "username",
+    ["username", "ip_address"],
 ]
 
-# Username-only lockout is intentional. IP-based lockout could affect
-# multiple users sharing the same public address.
-SILENCED_SYSTEM_CHECKS = [
-    "axes.W006",
-]
-
-# Lock the username after five failed authentication attempts.
+# Lock the username and IP pair after five failed authentication attempts.
 AXES_FAILURE_LIMIT = 5
 AXES_LOCK_OUT_AT_FAILURE = True
 
@@ -289,8 +283,7 @@ AXES_COOLOFF_TIME = timedelta(
     minutes=15,
 )
 
-# Keep the original lockout expiry when another attempt is made while
-# the username is already locked.
+# Keep the original lockout expiry when another attempt is made during lockout.
 AXES_RESET_COOL_OFF_ON_FAILURE_DURING_LOCKOUT = False
 
 # Clear accumulated failures after a successful authentication.
@@ -310,10 +303,8 @@ AXES_LOCKOUT_CALLABLE = (
     "accounts.security.login_lockout_response"
 )
 
-# Do not duplicate client IP addresses in Axes database records.
-AXES_CLIENT_IP_CALLABLE = (
-    "accounts.security.discard_client_ip"
-)
+# Use the shared client IP resolver for consistent proxy handling.
+AXES_CLIENT_IP_CALLABLE = "core.utils.get_client_ip"
 
 
 # ---------------------------------------------------------------------------
