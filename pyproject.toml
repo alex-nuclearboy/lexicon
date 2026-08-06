@@ -11,13 +11,31 @@ package-mode = false
 python = "^3.12"
 django = "^6.0.7"
 python-dotenv = "^1.2.2"
-psycopg = {extras = ["binary"], version = "^3.3.4"}
+psycopg = { extras = ["binary"], version = "^3.3.4" }
 dj-database-url = "^3.1.2"
 gunicorn = "^26.0.0"
 whitenoise = "^6.12.0"
 colorlog = "^6.12.0"
 django-axes = ">=8.3.1,<9"
 
+[tool.poetry.group.dev]
+optional = true
+
+[tool.poetry.group.dev.dependencies]
+pylint = "^4.0.6"
+pylint-django = "^2.8.0"
+
+[tool.pylint.main]
+load-plugins = ["pylint_django"]
+django-settings-module = "config.settings"
+ignore = ["migrations"]
+jobs = 0
+
+[tool.pylint.format]
+max-line-length = 79
+
+[tool.pylint.similarities]
+min-similarity-lines = 10
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,0 +1,96 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  POETRY_VERSION: "2.8"
+
+  DJANGO_SECRET_KEY: ci-placeholder-secret-key
+  DJANGO_DEBUG: "False"
+  DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,testserver
+
+  DATABASE_URL: postgresql://vocabio:vocabio@127.0.0.1:5432/vocabio
+  DATABASE_CONN_MAX_AGE: "0"
+  DATABASE_CONNECT_TIMEOUT: "5"
+
+  SECURE_SSL_REDIRECT: "False"
+
+jobs:
+  checks:
+    name: Checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    services:
+      postgres:
+        image: postgres:17-alpine
+
+        env:
+          POSTGRES_DB: vocabio
+          POSTGRES_USER: vocabio
+          POSTGRES_PASSWORD: vocabio
+
+        ports:
+          - 5432:5432
+
+        options: >-
+          --health-cmd "pg_isready -U vocabio -d vocabio"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Install Poetry
+        run: pipx install "poetry==$POETRY_VERSION"
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: poetry
+          cache-dependency-path: poetry.lock
+
+      - name: Validate Poetry configuration
+        run: poetry check
+
+      - name: Install dependencies
+        run: poetry install --with dev --no-interaction --no-root --no-ansi
+
+      - name: Run Pylint
+        run: >
+          poetry run pylint
+          --django-settings-module=config.settings
+          --output-format=github
+          accounts
+          core
+          config
+          manage.py
+
+      - name: Run Django checks
+        run: poetry run python manage.py check
+
+      - name: Check migrations
+        run: >
+          poetry run python manage.py makemigrations
+          --check
+          --dry-run
+
+      - name: Check static files
+        run: poetry run python manage.py collectstatic --noinput
+
+      - name: Run tests
+        run: poetry run python manage.py test
