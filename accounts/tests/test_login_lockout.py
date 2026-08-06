@@ -106,7 +106,7 @@ class LoginLockoutTests(TestCase):
         )
         self.assertEqual(
             settings.AXES_LOCKOUT_PARAMETERS,
-            ["username"],
+            [["username", "ip_address"]],
         )
         self.assertEqual(
             settings.AXES_FAILURE_LIMIT,
@@ -139,7 +139,7 @@ class LoginLockoutTests(TestCase):
         )
         self.assertEqual(
             settings.AXES_CLIENT_IP_CALLABLE,
-            "accounts.security.discard_client_ip",
+            "core.utils.get_client_ip",
         )
 
     def test_failed_attempt_is_stored_in_database(
@@ -257,10 +257,10 @@ class LoginLockoutTests(TestCase):
             ),
         )
 
-    def test_locked_username_remains_locked_from_another_ip(
+    def test_rotating_ip_avoids_lockout_but_credentials_still_required(
         self,
     ) -> None:
-        """Apply the username lockout independently of IP."""
+        """Document the accepted trade-off: IP rotation resets the counter."""
         for attempt_number in range(
             settings.AXES_FAILURE_LIMIT
         ):
@@ -270,6 +270,39 @@ class LoginLockoutTests(TestCase):
                 ip_address=(
                     f"192.0.2.{attempt_number + 1}"
                 ),
+            )
+
+            self.assertEqual(
+                response.status_code,
+                200,
+            )
+
+        response = self._post_login(
+            username=self.user.username,
+            password=TEST_PASSWORD,
+            ip_address="198.51.100.25",
+        )
+
+        self.assertRedirects(
+            response,
+            self.home_url,
+            fetch_redirect_response=False,
+        )
+
+    def test_owner_is_not_locked_out_by_attack_from_another_ip(
+        self,
+    ) -> None:
+        """Keep the account's real owner able to sign in during an attack."""
+        attacker_ip = "203.0.113.10"
+        owner_ip = "198.51.100.25"
+
+        for attempt_number in range(
+            settings.AXES_FAILURE_LIMIT
+        ):
+            response = self._post_login(
+                username=self.user.username,
+                password=WRONG_PASSWORD,
+                ip_address=attacker_ip,
             )
 
             expected_status = (
@@ -287,12 +320,13 @@ class LoginLockoutTests(TestCase):
         response = self._post_login(
             username=self.user.username,
             password=TEST_PASSWORD,
-            ip_address="198.51.100.25",
+            ip_address=owner_ip,
         )
 
-        self.assertEqual(
-            response.status_code,
-            429,
+        self.assertRedirects(
+            response,
+            self.home_url,
+            fetch_redirect_response=False,
         )
 
     def test_lockout_does_not_block_another_username(
