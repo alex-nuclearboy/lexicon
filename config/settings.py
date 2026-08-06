@@ -236,6 +236,10 @@ for environment_name in (
     ):
         ALLOWED_HOSTS.append(koyeb_internal_host)
 
+# Koyeb terminates TLS and forwards HTTP internally.
+# # Trust this header so Django detects HTTPS and avoids redirect loops.
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 # Redirect HTTP requests to HTTPS when enabled by the environment.
 SECURE_SSL_REDIRECT = get_bool_env(
     "SECURE_SSL_REDIRECT",

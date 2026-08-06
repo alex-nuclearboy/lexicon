@@ -1,1 +1,1 @@
-web: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --access-logfile /dev/null --error-logfile - --log-level warning
+web: gunicorn config.wsgi:application --bind 0.0.0.0:$PORT --forwarded-allow-ips="*" --access-logfile /dev/null --error-logfile - --log-level warning
