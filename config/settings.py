@@ -1,5 +1,4 @@
-"""
-Django settings for the Vocabio project.
+"""Django settings for the Vocabio project.
 
 The same settings module is used for local development and production.
 
@@ -58,8 +57,7 @@ FALSE_ENV_VALUES = frozenset(
 
 
 def get_required_env(name: str) -> str:
-    """
-    Read and validate a required environment variable.
+    """Read and validate a required environment variable.
 
     Empty and whitespace-only values are rejected with a configuration error.
     """
@@ -75,8 +73,7 @@ def get_required_env(name: str) -> str:
 
 
 def get_str_env(name: str, default: str) -> str:
-    """
-    Read a text environment variable.
+    """Read a text environment variable.
 
     Missing, empty, and whitespace-only values use the default value.
     """
@@ -84,8 +81,7 @@ def get_str_env(name: str, default: str) -> str:
 
 
 def get_bool_env(name: str, default: bool = False) -> bool:
-    """
-    Read and validate a Boolean environment variable.
+    """Read and validate a Boolean environment variable.
 
     Common textual Boolean representations are accepted. Invalid values cause
     an explicit configuration error instead of silently becoming false.
@@ -105,8 +101,7 @@ def get_bool_env(name: str, default: bool = False) -> bool:
 
 
 def get_int_env(name: str, default: int) -> int:
-    """
-    Read and validate a non-negative integer environment variable.
+    """Read and validate a non-negative integer environment variable.
 
     The default value is used when the variable is absent. Invalid or negative
     values cause an explicit configuration error.
@@ -133,8 +128,7 @@ def build_database_config(
     conn_max_age: int,
     connect_timeout: int,
 ) -> dict[str, Any]:
-    """
-    Build and validate the Django PostgreSQL configuration.
+    """Build and validate the Django PostgreSQL configuration.
 
     The database URL is parsed into Django's configuration format. PostgreSQL
     usage, required connection values, connection timeout, health checks, and

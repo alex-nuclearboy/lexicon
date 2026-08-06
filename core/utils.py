@@ -4,8 +4,7 @@ from django.http import HttpRequest
 
 
 def get_client_ip(request: HttpRequest) -> str:
-    """
-    Return the best-effort IP address of the client making the request.
+    """Return the best-effort IP address of the client making the request.
 
     The first address in ``X-Forwarded-For`` is preferred because the
     application normally runs behind a platform proxy. ``REMOTE_ADDR`` is
