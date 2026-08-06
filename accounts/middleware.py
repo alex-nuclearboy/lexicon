@@ -15,13 +15,9 @@ from core.utils import get_client_ip
 
 GetResponse = Callable[[HttpRequest], HttpResponse]
 
-logger = logging.getLogger(
-    f"vocabio.{__name__}"
-)
+logger = logging.getLogger(f"vocabio.{__name__}")
 
-audit_logger = logging.getLogger(
-    f"vocabio.audit.{__name__}"
-)
+audit_logger = logging.getLogger(f"vocabio.audit.{__name__}")
 
 # Named URL patterns that bypass the application access check.
 #
