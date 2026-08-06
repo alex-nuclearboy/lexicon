@@ -23,6 +23,23 @@ audit_logger = logging.getLogger(
 )
 
 
+def resolve_axes_client_ip(
+    request: HttpRequest,
+) -> str | None:
+    """Return a database-safe client IP for Axes.
+    
+    Convert the ``"unknown"`` sentinel from ``get_client_ip`` to ``None``
+
+    Args:
+        request: The current HTTP request.
+
+    Returns:
+        The client's IP address, or ``None`` when it could not be resolved.
+    """
+    client_ip = get_client_ip(request)
+    return client_ip if client_ip != "unknown" else None
+
+
 def login_lockout_response(
     request: HttpRequest,
     _original_response: HttpResponse | None,
@@ -45,7 +62,7 @@ def login_lockout_response(
         )
         or ""
     )
-    client_ip = get_client_ip(request)
+    client_ip = resolve_axes_client_ip(request)
     cool_off = get_cool_off(request)
 
     retry_after_seconds = 0

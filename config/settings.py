@@ -303,8 +303,10 @@ AXES_LOCKOUT_CALLABLE = (
     "accounts.security.login_lockout_response"
 )
 
-# Use the shared client IP resolver for consistent proxy handling.
-AXES_CLIENT_IP_CALLABLE = "core.utils.get_client_ip"
+# Resolve the client IP consistently and map unknown values to None.
+AXES_CLIENT_IP_CALLABLE = (
+    "accounts.security.resolve_axes_client_ip"
+)
 
 
 # ---------------------------------------------------------------------------
