@@ -2,28 +2,16 @@
 
 from django.contrib import admin
 from django.contrib.auth import get_user_model
-from django.contrib.auth.models import Permission
-from django.contrib.contenttypes.models import ContentType
 from django.http import HttpRequest, HttpResponse
 from django.test import TestCase, override_settings
 from django.urls import include, path, reverse
 
-from accounts.models import ApplicationPermissions
+from accounts.tests.helpers import (
+    TEST_STORAGES,
+    get_application_access_permission,
+)
 
 User = get_user_model()
-
-TEST_STORAGES = {
-    "default": {
-        "BACKEND": (
-            "django.core.files.storage.FileSystemStorage"
-        ),
-    },
-    "staticfiles": {
-        "BACKEND": (
-            "django.contrib.staticfiles.storage.StaticFilesStorage"
-        ),
-    },
-}
 
 
 def protected_view(request: HttpRequest) -> HttpResponse:
@@ -65,20 +53,13 @@ urlpatterns = [
     ROOT_URLCONF=__name__,
     STORAGES=TEST_STORAGES,
 )
-class ApplicationPermissionsMiddlewareTests(TestCase):
+class ApplicationAccessMiddlewareTests(TestCase):
     """Verify application-wide access control through real requests."""
 
     @classmethod
     def setUpTestData(cls) -> None:
         """Create reusable accounts and the application permission."""
-        content_type = ContentType.objects.get_for_model(
-            ApplicationPermissions,
-            for_concrete_model=False,
-        )
-        cls.access_permission = Permission.objects.get(
-            content_type=content_type,
-            codename="access_application",
-        )
+        cls.access_permission = get_application_access_permission()
 
         cls.user = User.objects.create_user(
             username="member",
@@ -154,7 +135,7 @@ class ApplicationPermissionsMiddlewareTests(TestCase):
         self.client.force_login(self.user)
 
         with self.assertLogs(
-            "vocabio.audit.core.middleware",
+            "vocabio.audit.accounts.middleware",
             level="WARNING",
         ) as captured_logs:
             response = self.client.get(

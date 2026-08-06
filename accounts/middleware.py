@@ -1,4 +1,4 @@
-"""Site-wide application access control for Vocabio."""
+"""Application-wide account access middleware."""
 
 import logging
 from collections.abc import Callable
