@@ -25,7 +25,7 @@ def resolve_axes_client_ip(
 ) -> str | None:
     """Return a database-safe client IP for Axes.
 
-    Convert the ``"unknown"`` sentinel from ``get_client_ip`` to ``None``
+    Convert the ``"unknown"`` sentinel from ``get_client_ip`` to ``None``.
 
     Args:
         request: The current HTTP request.
