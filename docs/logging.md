@@ -47,6 +47,20 @@ and duration.
 Query strings, referrers, user agents, and client IP addresses are omitted
 from the Gunicorn access-log format.
 
+## Routine database maintenance
+
+The following commands should be run in the production environment once per
+month:
+
+    poetry run python manage.py axes_reset_logs 30
+    poetry run python manage.py clearsessions
+
+The first command removes Django Axes access-log records older than 30 days.
+The second command removes expired Django session records.
+
+The global `axes_reset` command must not be used for routine maintenance
+because it removes all current lockout and access records.
+
 ## Django Axes records
 
 Django Axes uses the application PostgreSQL database to store authentication
@@ -54,10 +68,6 @@ attempts and access records.
 
 Successful authentication clears accumulated failures according to the
 configured Axes policy.
-
-Access-log records older than 30 days can be removed manually with:
-
-    poetry run python manage.py axes_reset_logs 30
 
 A lockout for a specific IP address can be cleared with:
 
