@@ -310,9 +310,9 @@ AXES_LOCKOUT_CALLABLE = (
     "accounts.security.login_lockout_response"
 )
 
-# Resolve the client IP consistently and map unknown values to None.
+# Resolve and validate the client IP consistently.
 AXES_CLIENT_IP_CALLABLE = (
-    "accounts.security.resolve_axes_client_ip"
+    "core.request.get_client_ip"
 )
 
 

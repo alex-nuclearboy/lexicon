@@ -15,26 +15,9 @@ from django.http import HttpRequest, HttpResponse
 from django.shortcuts import render
 from django.utils import timezone
 
-from core.utils import get_client_ip
+from core.request import get_client_ip
 
 audit_logger = logging.getLogger(f"vocabio.audit.{__name__}")
-
-
-def resolve_axes_client_ip(
-    request: HttpRequest,
-) -> str | None:
-    """Return a database-safe client IP for Axes.
-
-    Convert the ``"unknown"`` sentinel from ``get_client_ip`` to ``None``.
-
-    Args:
-        request: The current HTTP request.
-
-    Returns:
-        The client's IP address, or ``None`` when it could not be resolved.
-    """
-    client_ip = get_client_ip(request)
-    return client_ip if client_ip != "unknown" else None
 
 
 def login_lockout_response(
@@ -59,21 +42,20 @@ def login_lockout_response(
         )
         or ""
     )
-    client_ip = resolve_axes_client_ip(request)
+    client_ip = get_client_ip(request)
     cool_off = get_cool_off(request)
 
     retry_after_seconds = 0
 
     if cool_off is not None:
-        retry_after_seconds = ceil(cool_off.total_seconds())
+        retry_after_seconds = ceil(
+            cool_off.total_seconds()
+        )
 
         if username:
-            access_attempts = (
-                AccessAttempt.objects  # pylint: disable=no-member
-            )
-
             latest_attempt_time = (
-                access_attempts.filter(
+                AccessAttempt.objects  # pylint: disable=no-member
+                .filter(
                     username=username,
                     ip_address=client_ip,
                 )
@@ -86,13 +68,16 @@ def login_lockout_response(
             )
 
             if latest_attempt_time is not None:
-                lockout_expires_at = latest_attempt_time + cool_off
+                lockout_expires_at = (
+                    latest_attempt_time + cool_off
+                )
 
                 retry_after_seconds = max(
                     1,
                     ceil(
                         (
-                            lockout_expires_at - timezone.now()
+                            lockout_expires_at
+                            - timezone.now()
                         ).total_seconds()
                     ),
                 )
@@ -108,15 +93,11 @@ def login_lockout_response(
 
     audit_logger.warning(
         "[AUTH|LOCKOUT] Login attempt blocked because the username and IP "
-        "address are temporarily locked | username=%s | ip_address=%s | "
+        "address are temporarily locked | username=%s | client_ip=%s | "
         "retry_after_seconds=%s.",
         username or "<unknown>",
         client_ip or "<unknown>",
-        (
-            retry_after_seconds
-            if retry_after_seconds is not None
-            else "unknown"
-        ),
+        retry_after_seconds,
     )
 
     response = render(
@@ -135,6 +116,8 @@ def login_lockout_response(
     )
 
     if retry_after_seconds:
-        response.headers["Retry-After"] = str(retry_after_seconds)
+        response.headers["Retry-After"] = str(
+            retry_after_seconds
+        )
 
     return response

@@ -23,7 +23,7 @@ from django.views.decorators.http import (
     require_POST,
 )
 
-from core.utils import get_client_ip
+from core.request import get_client_ip
 
 from accounts.access import can_access_application
 from accounts.forms import (
@@ -118,10 +118,10 @@ def login_view(request: HttpRequest) -> HttpResponse:
 
                 audit_logger.info(
                     "[AUTH|LOGIN] User signed in successfully | "
-                    "username=%s | user_id=%s | ip=%s.",
+                    "username=%s | user_id=%s | client_ip=%s.",
                     user.get_username(),
                     user.pk,
-                    get_client_ip(request),
+                    get_client_ip(request) or "<unknown>",
                 )
 
                 messages.success(
@@ -145,8 +145,8 @@ def login_view(request: HttpRequest) -> HttpResponse:
             ):
                 audit_logger.warning(
                     "[AUTH|FAILED] Login attempt failed because "
-                    "the credentials were invalid | ip=%s.",
-                    get_client_ip(request),
+                    "the credentials were invalid | client_ip=%s.",
+                    get_client_ip(request) or "<unknown>",
                 )
 
     return render(
@@ -196,10 +196,10 @@ def password_change_view(
         audit_logger.info(
             "[AUTH|PASSWORD_CHANGE] User changed their "
             "password successfully | username=%s | "
-            "user_id=%s | ip=%s.",
+            "user_id=%s | client_ip=%s.",
             user.get_username(),
             user.pk,
-            get_client_ip(request),
+            get_client_ip(request) or "<unknown>",
         )
 
         messages.success(
@@ -247,10 +247,10 @@ def logout_view(request: HttpRequest) -> HttpResponse:
     if user_id is not None:
         audit_logger.info(
             "[AUTH|LOGOUT] User signed out successfully | "
-            "username=%s | user_id=%s | ip=%s.",
+            "username=%s | user_id=%s | client_ip=%s.",
             username,
             user_id,
-            client_ip,
+            client_ip or "<unknown>",
         )
 
     messages.success(

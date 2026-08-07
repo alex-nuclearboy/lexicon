@@ -118,7 +118,7 @@ class LoginLockoutTests(TestCase):
         )
         self.assertEqual(
             settings.AXES_CLIENT_IP_CALLABLE,
-            "accounts.security.resolve_axes_client_ip",
+            "core.request.get_client_ip",
         )
 
     def test_failed_attempt_is_stored_in_database(

@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 from accounts.access import can_access_application
 from accounts.ui_messages import APPLICATION_ACCESS_DENIED
-from core.utils import get_client_ip
+from core.request import get_client_ip
 
 audit_logger = logging.getLogger(f"vocabio.audit.{__name__}")
 
@@ -76,15 +76,15 @@ class ApplicationLoginForm(AuthenticationForm):
             client_ip = (
                 get_client_ip(self.request)
                 if self.request is not None
-                else "unknown"
+                else None
             )
 
             audit_logger.warning(
-                "[AUTH|DENIED] Authenticated account denied "
-                "application access | username=%s | user_id=%s | ip=%s.",
+                "[AUTH|DENIED] Authenticated account denied application "
+                "access | username=%s | user_id=%s | client_ip=%s.",
                 user.get_username(),
                 user.pk,
-                client_ip,
+                client_ip or "<unknown>",
             )
 
             raise ValidationError(

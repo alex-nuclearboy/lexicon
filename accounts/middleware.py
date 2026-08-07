@@ -11,7 +11,7 @@ from django.urls import Resolver404, resolve
 
 from accounts.access import can_access_application
 from accounts.ui_messages import APPLICATION_ACCESS_DENIED
-from core.utils import get_client_ip
+from core.request import get_client_ip
 
 GetResponse = Callable[[HttpRequest], HttpResponse]
 
@@ -83,9 +83,9 @@ class ApplicationAccessMiddleware:
         if not request.user.is_authenticated:
             logger.info(
                 "[ACCESS|REDIRECT] Anonymous request redirected "
-                "to login | path=%s | ip=%s.",
+                "to login | path=%s | client_ip=%s.",
                 request.path,
-                get_client_ip(request),
+                get_client_ip(request) or "<unknown>",
             )
 
             return redirect_to_login(
@@ -98,11 +98,11 @@ class ApplicationAccessMiddleware:
 
         audit_logger.warning(
             "[ACCESS|DENIED] Application access denied | "
-            "username=%s | user_id=%s | path=%s | ip=%s.",
+            "username=%s | user_id=%s | path=%s | client_ip=%s.",
             request.user.get_username(),
             request.user.pk,
             request.path,
-            get_client_ip(request),
+            get_client_ip(request) or "<unknown>",
         )
 
         raise PermissionDenied(
