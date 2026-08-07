@@ -123,6 +123,18 @@ def get_int_env(name: str, default: int) -> int:
     return value
 
 
+def get_list_env(name: str) -> list[str]:
+    """Read a comma-separated environment variable.
+
+    Missing, empty, and whitespace-only items are omitted.
+    """
+    return [
+        item.strip()
+        for item in os.getenv(name, "").split(",")
+        if item.strip()
+    ]
+
+
 def build_database_config(
     database_url: str,
     conn_max_age: int,
@@ -196,7 +208,9 @@ def build_database_config(
 # ---------------------------------------------------------------------------
 
 # A missing secret key is treated as a configuration error.
-SECRET_KEY = get_required_env("DJANGO_SECRET_KEY")
+SECRET_KEY = get_required_env(
+    "DJANGO_SECRET_KEY"
+)
 
 # Debug mode should be enabled only in the local development environment.
 DEBUG = get_bool_env(
@@ -204,47 +218,37 @@ DEBUG = get_bool_env(
     default=False,
 )
 
+IS_PRODUCTION = not DEBUG
+
 # Multiple hosts are supplied as a comma-separated environment variable.
-ALLOWED_HOSTS = [
-    host.strip()
-    for host in os.getenv(
-        "DJANGO_ALLOWED_HOSTS",
-        "",
-    ).split(",")
-    if host.strip()
-]
+ALLOWED_HOSTS = get_list_env(
+    "DJANGO_ALLOWED_HOSTS"
+)
 
-# Allow internal Koyeb requests addressed by a platform identifier.
-for environment_name in (
-    "KOYEB_SERVICE_ID",
-    "KOYEB_INSTANCE_ID",
-):
-    koyeb_internal_host = os.getenv(
-        environment_name,
-        "",
-    ).strip()
+if IS_PRODUCTION and not ALLOWED_HOSTS:
+    raise ImproperlyConfigured(
+        "DJANGO_ALLOWED_HOSTS must be configured when "
+        "DJANGO_DEBUG is False."
+    )
 
-    if (
-        koyeb_internal_host
-        and koyeb_internal_host not in ALLOWED_HOSTS
-    ):
-        ALLOWED_HOSTS.append(koyeb_internal_host)
+if IS_PRODUCTION and "*" in ALLOWED_HOSTS:
+    raise ImproperlyConfigured(
+        "DJANGO_ALLOWED_HOSTS must not contain '*' in production."
+    )
 
 # Trusted origins are supplied as comma-separated absolute URLs.
 CSRF_TRUSTED_ORIGINS = [
-    origin.strip().rstrip("/")
-    for origin in os.getenv(
-        "DJANGO_CSRF_TRUSTED_ORIGINS",
-        "",
-    ).split(",")
-    if origin.strip()
+    origin.rstrip("/")
+    for origin in get_list_env(
+        "DJANGO_CSRF_TRUSTED_ORIGINS"
+    )
 ]
 
 # Koyeb terminates TLS and forwards HTTP internally.
 # Trust this header so Django detects HTTPS and avoids redirect loops.
 SECURE_PROXY_SSL_HEADER = (
     "HTTP_X_FORWARDED_PROTO",
-    "https"
+    "https",
 )
 
 # Redirect HTTP requests to HTTPS when enabled by the environment.
@@ -254,8 +258,8 @@ SECURE_SSL_REDIRECT = get_bool_env(
 )
 
 # Production cookies are transmitted only over HTTPS.
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
+SESSION_COOKIE_SECURE = IS_PRODUCTION
+CSRF_COOKIE_SECURE = IS_PRODUCTION
 
 
 # ---------------------------------------------------------------------------

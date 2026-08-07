@@ -16,7 +16,7 @@ concurrency:
 env:
   POETRY_VERSION: "2.4.1"
 
-  DJANGO_SECRET_KEY: ci-placeholder-secret-key
+  DJANGO_SECRET_KEY: "ci-only-secret-key-h6-unp6$s)%%2ck5ug*8e9+c^)m+n=1hd$z4=s16soupcoa2&+"
   DJANGO_DEBUG: "False"
   DJANGO_ALLOWED_HOSTS: localhost,127.0.0.1,testserver
 
@@ -78,10 +78,17 @@ jobs:
           accounts
           core
           config
+          gunicorn.conf.py
           manage.py
 
       - name: Run Django checks
         run: poetry run python manage.py check
+
+      - name: Run Django deployment checks
+        env:
+          SECURE_SSL_REDIRECT: "True"
+          DJANGO_ALLOWED_HOSTS: "example.com"
+        run: poetry run python manage.py check --deploy
 
       - name: Check migrations
         run: >
