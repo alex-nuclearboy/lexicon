@@ -7,14 +7,15 @@ authors = [
 ]
 license = "Apache-2.0"
 readme = "README.md"
+requires-python = ">=3.12,<3.15"
 dynamic = ["dependencies"]
 
 [tool.poetry]
 package-mode = false
 
 [tool.poetry.dependencies]
-python = "^3.12"
-django = "^6.0.7"
+python = ">=3.12,<3.15"
+django = ">=6.0.8,<6.1"
 python-dotenv = "^1.2.2"
 psycopg = { extras = ["binary"], version = "^3.3.4" }
 dj-database-url = "^3.1.2"
