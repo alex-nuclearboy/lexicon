@@ -91,9 +91,7 @@
 }
 
 .login-card__logo-link:focus-visible {
-    outline: 
-        3px solid
-        rgb(var(--colour-brand-rgb) / 25%);
+    outline: 3px solid rgb(var(--colour-brand-rgb) / 25%);
     outline-offset: 4px;
 }
 
