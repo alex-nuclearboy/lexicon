@@ -230,9 +230,22 @@ for environment_name in (
     ):
         ALLOWED_HOSTS.append(koyeb_internal_host)
 
+# Trusted origins are supplied as comma-separated absolute URLs.
+CSRF_TRUSTED_ORIGINS = [
+    origin.strip().rstrip("/")
+    for origin in os.getenv(
+        "DJANGO_CSRF_TRUSTED_ORIGINS",
+        "",
+    ).split(",")
+    if origin.strip()
+]
+
 # Koyeb terminates TLS and forwards HTTP internally.
 # Trust this header so Django detects HTTPS and avoids redirect loops.
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_PROXY_SSL_HEADER = (
+    "HTTP_X_FORWARDED_PROTO",
+    "https"
+)
 
 # Redirect HTTP requests to HTTPS when enabled by the environment.
 SECURE_SSL_REDIRECT = get_bool_env(
