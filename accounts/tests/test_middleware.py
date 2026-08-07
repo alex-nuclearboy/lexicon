@@ -87,16 +87,44 @@ class ApplicationAccessMiddlewareTests(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_anonymous_user_is_redirected_to_login(self) -> None:
-        """Redirect an anonymous protected request with its destination."""
+        """Redirect an anonymous protected request and record the event."""
         protected_url = reverse("protected")
         login_url = reverse("accounts:login")
 
-        response = self.client.get(protected_url)
+        with self.assertLogs(
+            "vocabio.accounts.middleware",
+            level="INFO",
+        ) as captured_logs:
+            response = self.client.get(protected_url)
 
         self.assertRedirects(
             response,
             f"{login_url}?next={protected_url}",
             fetch_redirect_response=False,
+        )
+
+        self.assertEqual(
+            len(captured_logs.output),
+            1,
+        )
+
+        log_message = captured_logs.output[0]
+
+        self.assertIn(
+            "[ACCESS|CHECK]",
+            log_message,
+        )
+        self.assertIn(
+            "outcome=redirected",
+            log_message,
+        )
+        self.assertIn(
+            "path=/protected/",
+            log_message,
+        )
+        self.assertIn(
+            "client_ip=127.0.0.1",
+            log_message,
         )
 
     def test_user_with_permission_can_open_protected_view(
@@ -147,21 +175,32 @@ class ApplicationAccessMiddlewareTests(TestCase):
             len(captured_logs.output),
             1,
         )
+
+        log_message = captured_logs.output[0]
+
         self.assertIn(
-            "[ACCESS|DENIED]",
-            captured_logs.output[0],
+            "[ACCESS|CHECK]",
+            log_message,
         )
         self.assertIn(
-            "username=member",
-            captured_logs.output[0],
+            "outcome=denied",
+            log_message,
         )
         self.assertIn(
             f"user_id={self.user.pk}",
-            captured_logs.output[0],
+            log_message,
         )
         self.assertIn(
             "path=/protected/",
-            captured_logs.output[0],
+            log_message,
+        )
+        self.assertIn(
+            "client_ip=127.0.0.1",
+            log_message,
+        )
+        self.assertNotIn(
+            "username=",
+            log_message,
         )
 
     def test_admin_uses_its_own_login_flow(self) -> None:

@@ -82,8 +82,8 @@ class ApplicationAccessMiddleware:
 
         if not request.user.is_authenticated:
             logger.info(
-                "[ACCESS|REDIRECT] Anonymous request redirected "
-                "to login | path=%s | client_ip=%s.",
+                "[ACCESS|CHECK] Anonymous request redirected to login | "
+                "outcome=redirected | path=%s | client_ip=%s.",
                 request.path,
                 get_client_ip(request) or "<unknown>",
             )
@@ -97,9 +97,8 @@ class ApplicationAccessMiddleware:
             return self.get_response(request)
 
         audit_logger.warning(
-            "[ACCESS|DENIED] Application access denied | "
-            "username=%s | user_id=%s | path=%s | client_ip=%s.",
-            request.user.get_username(),
+            "[ACCESS|CHECK] Application access denied | "
+            "outcome=denied | user_id=%s | path=%s | client_ip=%s.",
             request.user.pk,
             request.path,
             get_client_ip(request) or "<unknown>",

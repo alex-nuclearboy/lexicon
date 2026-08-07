@@ -92,9 +92,9 @@ def login_lockout_response(
     )
 
     audit_logger.warning(
-        "[AUTH|LOCKOUT] Login attempt blocked because the username and IP "
-        "address are temporarily locked | username=%s | client_ip=%s | "
-        "retry_after_seconds=%s.",
+        "[AUTH|LOGIN] Login attempt blocked because the username "
+        "and IP address are temporarily locked | outcome=locked | "
+        "username=%s | client_ip=%s | retry_after_seconds=%s.",
         username or "<unknown>",
         client_ip or "<unknown>",
         retry_after_seconds,

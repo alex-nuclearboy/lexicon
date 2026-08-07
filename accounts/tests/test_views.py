@@ -194,21 +194,29 @@ class AuthenticationViewTests(TestCase):
             len(captured_logs.output),
             1,
         )
+
+        log_message = captured_logs.output[0]
+
         self.assertIn(
             "[AUTH|LOGIN]",
-            captured_logs.output[0],
+            log_message,
         )
         self.assertIn(
-            "username=member",
-            captured_logs.output[0],
+            "outcome=success",
+            log_message,
         )
         self.assertIn(
             f"user_id={self.allowed_user.pk}",
-            captured_logs.output[0],
+            log_message,
         )
         self.assertIn(
-            "ip=127.0.0.1",
-            captured_logs.output[0],
+            "client_ip=127.0.0.1",
+            log_message,
+        )
+
+        self.assertNotIn(
+            "username=",
+            log_message,
         )
 
         message_texts = [
@@ -258,17 +266,28 @@ class AuthenticationViewTests(TestCase):
             len(captured_logs.output),
             1,
         )
+
+        log_message = captured_logs.output[0]
+
         self.assertIn(
-            "[AUTH|FAILED]",
-            captured_logs.output[0],
+            "[AUTH|LOGIN]",
+            log_message,
         )
         self.assertIn(
-            "ip=127.0.0.1",
-            captured_logs.output[0],
+            "outcome=failure",
+            log_message,
+        )
+        self.assertIn(
+            "client_ip=127.0.0.1",
+            log_message,
+        )
+        self.assertNotIn(
+            "username=",
+            log_message,
         )
         self.assertNotIn(
             TEST_PASSWORD,
-            captured_logs.output[0],
+            log_message,
         )
 
     def test_user_without_access_is_rejected_and_logged(
@@ -313,21 +332,28 @@ class AuthenticationViewTests(TestCase):
             len(captured_logs.output),
             1,
         )
+
+        log_message = captured_logs.output[0]
+
         self.assertIn(
-            "[AUTH|DENIED]",
-            captured_logs.output[0],
+            "[AUTH|LOGIN]",
+            log_message,
         )
         self.assertIn(
-            "username=restricted",
-            captured_logs.output[0],
+            "outcome=denied",
+            log_message,
         )
         self.assertIn(
             f"user_id={self.denied_user.pk}",
-            captured_logs.output[0],
+            log_message,
         )
         self.assertIn(
-            "ip=127.0.0.1",
-            captured_logs.output[0],
+            "client_ip=127.0.0.1",
+            log_message,
+        )
+        self.assertNotIn(
+            "username=",
+            log_message,
         )
 
     def test_superuser_can_log_in(self) -> None:
@@ -517,21 +543,28 @@ class AuthenticationViewTests(TestCase):
             len(captured_logs.output),
             1,
         )
+
+        log_message = captured_logs.output[0]
+
         self.assertIn(
             "[AUTH|LOGOUT]",
-            captured_logs.output[0],
+            log_message,
         )
         self.assertIn(
-            "username=member",
-            captured_logs.output[0],
+            "outcome=success",
+            log_message,
         )
         self.assertIn(
             f"user_id={self.allowed_user.pk}",
-            captured_logs.output[0],
+            log_message,
         )
         self.assertIn(
-            "ip=127.0.0.1",
-            captured_logs.output[0],
+            "client_ip=127.0.0.1",
+            log_message,
+        )
+        self.assertNotIn(
+            "username=",
+            log_message,
         )
 
         message_texts = [
@@ -760,29 +793,36 @@ class PasswordChangeViewTests(TestCase):
             len(captured_logs.output),
             1,
         )
+
+        log_message = captured_logs.output[0]
+
         self.assertIn(
             "[AUTH|PASSWORD_CHANGE]",
-            captured_logs.output[0],
+            log_message,
         )
         self.assertIn(
-            "username=password-member",
-            captured_logs.output[0],
+            "outcome=success",
+            log_message,
         )
         self.assertIn(
             f"user_id={self.user.pk}",
-            captured_logs.output[0],
+            log_message,
         )
         self.assertIn(
-            "ip=127.0.0.1",
-            captured_logs.output[0],
+            "client_ip=127.0.0.1",
+            log_message,
+        )
+        self.assertNotIn(
+            "username=",
+            log_message,
         )
         self.assertNotIn(
             TEST_PASSWORD,
-            captured_logs.output[0],
+            log_message,
         )
         self.assertNotIn(
             TEST_CHANGE_PASSWORD,
-            captured_logs.output[0],
+            log_message,
         )
 
         message_texts = [

@@ -157,15 +157,48 @@ class LoginLockoutTests(TestCase):
                 200,
             )
 
-        response = self._post_login(
-            username=self.user.username,
-            password=WRONG_PASSWORD,
-        )
+        with self.assertLogs(
+            "vocabio.audit.accounts.security",
+            level="WARNING",
+        ) as captured_logs:
+            response = self._post_login(
+                username=self.user.username,
+                password=WRONG_PASSWORD,
+            )
 
         self.assertEqual(
             response.status_code,
             429,
         )
+
+        self.assertEqual(
+            len(captured_logs.output),
+            1,
+        )
+
+        log_message = captured_logs.output[0]
+
+        self.assertIn(
+            "[AUTH|LOGIN]",
+            log_message,
+        )
+        self.assertIn(
+            "outcome=locked",
+            log_message,
+        )
+        self.assertIn(
+            f"username={self.user.username}",
+            log_message,
+        )
+        self.assertIn(
+            "client_ip=192.0.2.1",
+            log_message,
+        )
+        self.assertIn(
+            "retry_after_seconds=",
+            log_message,
+        )
+
         self.assertTemplateUsed(
             response,
             "accounts/login_lockout.html",

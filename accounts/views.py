@@ -118,8 +118,7 @@ def login_view(request: HttpRequest) -> HttpResponse:
 
                 audit_logger.info(
                     "[AUTH|LOGIN] User signed in successfully | "
-                    "username=%s | user_id=%s | client_ip=%s.",
-                    user.get_username(),
+                    "outcome=success | user_id=%s | client_ip=%s.",
                     user.pk,
                     get_client_ip(request) or "<unknown>",
                 )
@@ -144,8 +143,9 @@ def login_view(request: HttpRequest) -> HttpResponse:
                 False,
             ):
                 audit_logger.warning(
-                    "[AUTH|FAILED] Login attempt failed because "
-                    "the credentials were invalid | client_ip=%s.",
+                    "[AUTH|LOGIN] Login attempt failed because the "
+                    "credentials were invalid | outcome=failure "
+                    "| client_ip=%s.",
                     get_client_ip(request) or "<unknown>",
                 )
 
@@ -194,10 +194,9 @@ def password_change_view(
         )
 
         audit_logger.info(
-            "[AUTH|PASSWORD_CHANGE] User changed their "
-            "password successfully | username=%s | "
-            "user_id=%s | client_ip=%s.",
-            user.get_username(),
+            "[AUTH|PASSWORD_CHANGE] User changed their password "
+            "successfully | outcome=success | user_id=%s | "
+            "client_ip=%s.",
             user.pk,
             get_client_ip(request) or "<unknown>",
         )
@@ -235,11 +234,6 @@ def logout_view(request: HttpRequest) -> HttpResponse:
         if request.user.is_authenticated
         else None
     )
-    username = (
-        request.user.get_username()
-        if request.user.is_authenticated
-        else None
-    )
     client_ip = get_client_ip(request)
 
     logout(request)
@@ -247,8 +241,7 @@ def logout_view(request: HttpRequest) -> HttpResponse:
     if user_id is not None:
         audit_logger.info(
             "[AUTH|LOGOUT] User signed out successfully | "
-            "username=%s | user_id=%s | client_ip=%s.",
-            username,
+            "outcome=success | user_id=%s | client_ip=%s.",
             user_id,
             client_ip or "<unknown>",
         )
