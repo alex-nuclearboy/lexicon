@@ -1,5 +1,7 @@
 """Integration tests for the authentication views."""
 
+from unittest.mock import patch
+
 from django.contrib.auth import (
     REDIRECT_FIELD_NAME,
     get_user_model,
@@ -967,3 +969,17 @@ class PasswordChangeViewTests(TestCase):
                     response.status_code,
                     405,
                 )
+
+    @patch("accounts.views.messages.success")
+    @patch("accounts.views.audit_logger.info")
+    def test_anonymous_logout_does_not_report_success(
+        self,
+        audit_log_mock,
+        success_message_mock,
+    ) -> None:
+        """Do not report a successful logout for an anonymous request."""
+        response = self.client.post(reverse("accounts:logout"))
+
+        self.assertEqual(response.status_code, 302)
+        audit_log_mock.assert_not_called()
+        success_message_mock.assert_not_called()

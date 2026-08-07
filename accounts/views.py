@@ -246,9 +246,9 @@ def logout_view(request: HttpRequest) -> HttpResponse:
             client_ip or "<unknown>",
         )
 
-    messages.success(
-        request,
-        LOGOUT_SUCCESSFUL,
-    )
+        messages.success(
+            request,
+            LOGOUT_SUCCESSFUL,
+        )
 
     return redirect(settings.LOGOUT_REDIRECT_URL)
