@@ -12,8 +12,10 @@ class GetClientIpTests(SimpleTestCase):
         """Create the request factory used by every test."""
         self.request_factory = RequestFactory()
 
-    def test_last_forwarded_address_is_returned(self) -> None:
-        """Prefer the final address from X-Forwarded-For."""
+    def test_spoofed_leftmost_forwarded_address_is_ignored(
+        self,
+    ) -> None:
+        """Trust only the final Koyeb-appended forwarded address."""
         request = self.request_factory.get(
             "/",
             HTTP_X_FORWARDED_FOR=(
@@ -25,6 +27,25 @@ class GetClientIpTests(SimpleTestCase):
         self.assertEqual(
             get_client_ip(request),
             "10.0.0.1",
+        )
+
+    def test_last_address_is_used_with_multiple_proxies(
+        self,
+    ) -> None:
+        """Use the final address from a multi-proxy forwarding chain."""
+        request = self.request_factory.get(
+            "/",
+            HTTP_X_FORWARDED_FOR=(
+                "198.51.100.25, "
+                "192.0.2.10, "
+                "203.0.113.7"
+            ),
+            REMOTE_ADDR="127.0.0.1",
+        )
+
+        self.assertEqual(
+            get_client_ip(request),
+            "203.0.113.7",
         )
 
     def test_forwarded_address_is_stripped(self) -> None:
@@ -71,6 +92,23 @@ class GetClientIpTests(SimpleTestCase):
             "127.0.0.1",
         )
 
+    def test_valid_leftmost_ip_is_ignored_when_last_ip_is_invalid(
+        self,
+    ) -> None:
+        """Do not fall back to an untrusted leftmost forwarded address."""
+        request = self.request_factory.get(
+            "/",
+            HTTP_X_FORWARDED_FOR=(
+                "198.51.100.25, not-an-ip"
+            ),
+            REMOTE_ADDR="127.0.0.1",
+        )
+
+        self.assertEqual(
+            get_client_ip(request),
+            "127.0.0.1",
+        )
+
     def test_none_is_returned_when_no_address_exists(
         self,
     ) -> None:
@@ -107,4 +145,19 @@ class GetClientIpTests(SimpleTestCase):
         self.assertEqual(
             get_client_ip(request),
             "2001:db8::1",
+        )
+
+    def test_forwarded_ipv6_address_is_supported(self) -> None:
+        """Return a validated IPv6 address from the forwarding header."""
+        request = self.request_factory.get(
+            "/",
+            HTTP_X_FORWARDED_FOR=(
+                "198.51.100.25, 2001:db8::10"
+            ),
+            REMOTE_ADDR="127.0.0.1",
+        )
+
+        self.assertEqual(
+            get_client_ip(request),
+            "2001:db8::10",
         )
