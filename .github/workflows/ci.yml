@@ -70,6 +70,9 @@ jobs:
       - name: Install dependencies
         run: poetry install --with dev --no-interaction --no-root --no-ansi
 
+      - name: Audit Python dependencies
+        run: poetry run python -m pip_audit --local
+
       - name: Run Pylint
         run: >
           poetry run pylint
@@ -99,5 +102,7 @@ jobs:
       - name: Check static files
         run: poetry run python manage.py collectstatic --noinput
 
-      - name: Run tests
-        run: poetry run python manage.py test
+      - name: Run tests with coverage
+        run: |
+          poetry run python -m coverage run manage.py test
+          poetry run python -m coverage report

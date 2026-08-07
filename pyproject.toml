@@ -30,6 +30,8 @@ optional = true
 [tool.poetry.group.dev.dependencies]
 pylint = "^4.0.6"
 pylint-django = "^2.8.0"
+coverage = "^7.15.4"
+pip-audit = "^2.10.1"
 
 [tool.pylint.main]
 load-plugins = ["pylint_django"]
@@ -42,6 +44,24 @@ max-line-length = 79
 
 [tool.pylint.similarities]
 min-similarity-lines = 10
+
+[tool.coverage.run]
+source = [
+    "accounts",
+    "config",
+    "core",
+]
+omit = [
+    "*/migrations/*",
+    "*/tests/*",
+    "config/asgi.py",
+    "config/wsgi.py",
+]
+
+[tool.coverage.report]
+fail_under = 95
+show_missing = true
+skip_covered = true
 
 [build-system]
 requires = ["poetry-core"]
