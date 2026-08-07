@@ -23,7 +23,7 @@ WRONG_PASSWORD = "Incorrect-test-password-456!"
 
 @override_settings(STORAGES=TEST_STORAGES)
 class LoginLockoutTests(TestCase):
-    """Verify username-based authentication lockouts."""
+    """Verify username-and-IP authentication lockouts."""
 
     @classmethod
     def setUpTestData(cls) -> None:
@@ -140,10 +140,10 @@ class LoginLockoutTests(TestCase):
             ).exists()
         )
 
-    def test_username_is_locked_on_fifth_failure(
+    def test_username_and_ip_are_locked_on_fifth_failure(
         self,
     ) -> None:
-        """Lock a username after five failed attempts."""
+        """Lock a username and IP pair after five failed attempts."""
         for _attempt in range(
             settings.AXES_FAILURE_LIMIT - 1
         ):
