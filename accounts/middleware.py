@@ -32,11 +32,6 @@ EXEMPT_URL_NAMES = frozenset(
     }
 )
 
-# Django Admin manages its own authentication and staff permissions.
-EXEMPT_PATH_PREFIXES = (
-    "/admin/",
-)
-
 
 # pylint: disable-next=too-few-public-methods
 class ApplicationAccessMiddleware:
@@ -122,14 +117,16 @@ class ApplicationAccessMiddleware:
         """
         path = request.path_info
 
-        if path.startswith(EXEMPT_PATH_PREFIXES):
-            return True
-
         try:
             match = resolve(path)
         except Resolver404:
             # Non-existent paths should continue to Django's normal 404
             # handling rather than being redirected to the login page.
+            return True
+
+        # Django Admin manages its own authentication and staff permissions,
+        # regardless of the URL path under which it is mounted.
+        if match.namespace == "admin":
             return True
 
         return match.view_name in EXEMPT_URL_NAMES

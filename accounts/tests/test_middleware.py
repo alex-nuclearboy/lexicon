@@ -35,7 +35,7 @@ urlpatterns = [
         name="protected",
     ),
     path(
-        "admin/",
+        "control-panel/",
         admin.site.urls,
     ),
     path(
@@ -203,7 +203,7 @@ class ApplicationAccessMiddlewareTests(TestCase):
             log_message,
         )
 
-    def test_admin_uses_its_own_login_flow(self) -> None:
+    def test_admin_namespace_uses_its_own_login_flow(self) -> None:
         """Leave Django Admin access control to Django Admin."""
         admin_url = reverse("admin:index")
         admin_login_url = reverse("admin:login")
