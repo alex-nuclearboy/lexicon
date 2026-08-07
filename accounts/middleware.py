@@ -21,12 +21,14 @@ audit_logger = logging.getLogger(f"vocabio.audit.{__name__}")
 
 # Named URL patterns that bypass the application access check.
 #
-# The home page and login page remain publicly available. Logout is exempt so
-# that an authenticated user can still end the session if application access
-# is revoked while the session is active.
+# The home page, login page, and health endpoints remain publicly available.
+# Logout is exempt so that an authenticated user can still end the session if
+# application access is revoked while the session is active.
 EXEMPT_URL_NAMES = frozenset(
     {
         "core:home",
+        "core:health-live",
+        "core:health-ready",
         "accounts:login",
         "accounts:logout",
     }
