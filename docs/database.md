@@ -1,124 +1,182 @@
+[← Back to project overview](../README.md)
+
 # Database operations and recovery
 
 ## Database provider
 
 The production PostgreSQL database is hosted by Neon.
 
-The application uses two production connection strings:
+The project uses two types of production database connection:
 
-- `DATABASE_URL` is the pooled Neon connection string used by the running
-  Django application;
-- `DIRECT_DATABASE_URL` is the direct Neon connection string used for schema
-  migrations and other administrative operations.
+- a pooled connection for the running Django application;
+- a direct connection for schema migrations and administrative database
+  operations.
 
-Production connection strings are stored as environment variables in the
-Koyeb Control Panel and must not be committed to the repository.
+Connection strings are stored as environment variables or encrypted secrets
+and must not be committed to the repository.
 
 ## Runtime connection
 
-The production `DATABASE_URL` uses the Neon pooled endpoint. Its hostname
-contains `-pooler`.
+The Django application running on Koyeb uses the pooled Neon connection through
+the `DATABASE_URL` environment variable.
 
-The production environment uses:
+The pooled endpoint hostname contains `-pooler`.
 
-    DATABASE_CONN_MAX_AGE=60
+Persistent database connections are enabled in production so that Django can
+reuse a connection for up to 60 seconds. Connection health checks verify that
+a persistent connection remains usable before it is reused.
 
-This allows Django to reuse a database connection for up to 60 seconds instead
-of opening a new connection for every request.
+A database connection attempt times out after five seconds.
 
-Django connection health checks are enabled when persistent connections are
-used.
-
-The application disables server-side cursors for the Neon pooled connection
-because the pooler operates in transaction mode.
+Server-side cursors are disabled for the pooled connection because the Neon
+pooler operates in transaction mode.
 
 ## Local development
 
-Local development uses a direct PostgreSQL connection.
+The local PostgreSQL database runs in Docker using the repository Docker
+Compose configuration.
 
-The local `.env` file uses:
+The local `.env` file contains the PostgreSQL container settings:
 
-    DATABASE_CONN_MAX_AGE=0
+```text
+POSTGRES_DB=vocabio
+POSTGRES_USER=vocabio
+POSTGRES_PASSWORD=<local database password>
+```
 
-This closes the database connection at the end of each request and keeps local
-database behaviour simple.
+Django connects to the local database through a direct PostgreSQL connection:
 
-The repository `.env.example` also uses zero because it documents the local
-development configuration rather than the production Koyeb configuration.
+```text
+DATABASE_URL=postgresql://vocabio:<local database password>@127.0.0.1:5432/vocabio
+DATABASE_CONN_MAX_AGE=0
+DATABASE_CONNECT_TIMEOUT=5
+```
 
-## Production environment variables
+A connection age of zero closes the database connection at the end of each
+request and keeps local database behaviour simple.
+
+The connection timeout limits how long Django waits when establishing a
+connection to PostgreSQL.
+
+The values used in `DATABASE_URL` must match the PostgreSQL credentials
+configured for the Docker container.
+
+The repository `.env.example` documents the same local database configuration
+using placeholder credentials.
+
+## Production configuration
+
+### Koyeb
 
 The following variables are configured in the Koyeb Control Panel:
 
-    DATABASE_URL=<pooled Neon connection string>
-    DIRECT_DATABASE_URL=<direct Neon connection string>
-    DATABASE_CONN_MAX_AGE=60
-    DATABASE_CONNECT_TIMEOUT=5
+```text
+DATABASE_URL=<pooled Neon connection string>
+DIRECT_DATABASE_URL=<direct Neon connection string>
+DATABASE_CONN_MAX_AGE=60
+DATABASE_CONNECT_TIMEOUT=5
+```
 
-The pooled `DATABASE_URL` is used by the running web application.
+The running Django application uses the pooled `DATABASE_URL`.
 
-The direct `DIRECT_DATABASE_URL` is used only for migrations, database dumps,
-and other administrative operations that should not run through transaction
-pooling.
+The direct `DIRECT_DATABASE_URL` is retained for administrative database
+operations.
 
 Database passwords and complete connection strings must not be copied into
 logs, documentation, issues, screenshots, or the Git repository.
 
+### GitHub Actions
+
+The same direct Neon connection string is stored as the following encrypted
+GitHub Actions secret:
+
+```text
+PRODUCTION_DATABASE_URL
+```
+
+It is used by the manual migration workflow:
+
+```text
+.github/workflows/production-migrations.yml
+```
+
+The secret must contain the direct Neon connection string rather than the
+pooled connection string.
+
 ## Schema migrations
 
-Production migrations are run through the Koyeb Control Panel.
+Production migrations are applied manually through GitHub Actions.
 
-1. Open the Vocabio service in the Koyeb Control Panel.
-2. Open the active running instance.
-3. Open **Shell** or **Execute command**.
-4. Run the migration using the direct database connection:
+When a release contains new migration files:
 
-       env DATABASE_URL="$DIRECT_DATABASE_URL" python manage.py migrate
+1. Create, review, and apply the migrations locally:
 
-5. Confirm the migration state:
+   ```text
+   poetry run python manage.py makemigrations
+   poetry run python manage.py migrate --plan
+   poetry run python manage.py migrate
+   ```
 
-       env DATABASE_URL="$DIRECT_DATABASE_URL" python manage.py showmigrations
+2. Run the project tests and quality checks.
 
-6. Close the instance shell after the commands finish.
+3. Commit and push the release branch.
 
-The application service continues to use the pooled `DATABASE_URL`. The
-environment override applies only to the command being executed.
+4. Wait for the regular CI workflow to complete successfully.
 
-Migrations must not be run using the pooled connection string.
+5. Open **Actions** in the GitHub repository.
 
-## Routine database maintenance
+6. Select **Production migrations**.
 
-The following commands should be run through the shell of the active Koyeb
-instance approximately once per month:
+7. Select **Run workflow** and choose the release branch containing the
+   migration files.
 
-    python manage.py axes_reset_logs 30
-    python manage.py clearsessions
+8. Enter the confirmation value:
 
-The first command removes Django Axes access-log records older than 30 days.
+   ```text
+   MIGRATE
+   ```
 
-The second command removes expired Django session records.
+9. Run the workflow and confirm that it completes successfully.
 
-These commands use the regular pooled application connection because they
-perform ordinary application-level database operations and do not require a
-direct connection.
+10. Merge the release branch into `main`.
 
-The global `axes_reset` command must not be used for routine maintenance
-because it removes all current lockout and access records.
+11. Verify the resulting Koyeb deployment.
+
+After deployment, check:
+
+```text
+/health/live/
+/health/ready/
+```
+
+Also verify login and the functionality affected by the schema change.
+
+The branch selected in the migration workflow must contain the same migration
+files that are merged into `main`.
+
+Schema changes that are not backward-compatible should be divided into
+separate releases so that the running application remains compatible with the
+database throughout the deployment.
 
 ## Backup policy
 
 Neon Backup & Restore is used as the production database recovery mechanism.
 
+The Free plan currently provides up to six hours of restore history or 1 GB of
+data changes, whichever limit is reached first, and supports one manual
+snapshot.
+
 Before a destructive or irreversible database operation:
 
 1. Open the production project in the Neon Console.
 2. Open **Backup & Restore**.
-3. Check the currently available point-in-time restore window.
-4. Create a manual snapshot when the feature is available for the active
-   Neon plan.
+3. Check the available point-in-time restore window.
+4. Create a manual snapshot for the operation. If the Free plan snapshot limit
+   has already been reached, delete the existing manual snapshot before
+   creating the new recovery point.
 5. Record the time immediately before the operation.
-6. Keep the recovery point until the migration and deployed application have
-   been verified.
+6. Keep the recovery point until the migration and deployment have been
+   verified.
 
 A recovery point should be prepared before:
 
@@ -127,30 +185,67 @@ A recovery point should be prepared before:
 - importing or deleting a large amount of data;
 - making significant production schema changes.
 
-The availability and retention of point-in-time history and snapshots depend
-on the active Neon plan and project configuration.
+Restore history and snapshot limits depend on the active Neon plan and project
+configuration.
 
 ## Restore procedure
 
-A production restore must not be started until the required restore point has
-been identified and checked.
+A production restore must not begin until the required restore point has been
+identified and checked.
 
 1. Open the production project in the Neon Console.
-2. Open **Backup & Restore**.
-3. Select the production branch.
-4. Select the required timestamp or snapshot.
-5. Preview the data before confirming the restore.
-6. Check important tables and records.
-7. Restore to a separate branch first when that option is available.
-8. Verify the restored schema and application data.
-9. Obtain the pooled and direct connection strings for the restored branch if
-   the connection strings changed.
-10. Update `DATABASE_URL` and `DIRECT_DATABASE_URL` in the Koyeb Control
-    Panel when necessary.
-11. Redeploy the Vocabio service.
-12. Run Django system checks and verify login and application data.
-13. Keep the previous database branch until the restored deployment has been
-    confirmed to work correctly.
 
-A restore must not be considered complete until the application can connect,
-authentication works, and important production records have been checked.
+2. Open **Backup & Restore**.
+
+3. Select the production branch.
+
+4. Select the required timestamp or snapshot.
+
+5. Inspect the selected recovery point:
+
+   - for a point-in-time restore, use **Preview data** before confirming the
+     restore;
+   - for a snapshot restore, use the multi-step restore option when a temporary
+     preview branch is required.
+
+6. Verify the schema and important application data in the preview when one
+   has been created.
+
+7. Confirm or finalise the restore to the production branch.
+
+8. Wait until the restore operation has completed.
+
+9. Verify the Vocabio deployment:
+
+   ```text
+   /health/live/
+   /health/ready/
+   ```
+
+10. Verify authentication and important production records.
+
+11. Keep any backup or orphaned branch created by Neon until the restored
+    application has been confirmed to work correctly.
+
+When the restore is finalised for the active production branch, its database
+connection strings remain unchanged.
+
+If a separate restored branch is intentionally promoted to production:
+
+1. Update `DATABASE_URL` in Koyeb with its pooled connection string.
+2. Update `DIRECT_DATABASE_URL` in Koyeb with its direct connection string.
+3. Update the `PRODUCTION_DATABASE_URL` GitHub Actions secret with its direct
+   connection string.
+4. Redeploy the Vocabio service on Koyeb.
+5. Verify the liveness and readiness endpoints.
+
+Run the production migration workflow only when the restored database must be
+brought forward to the schema expected by the application revision being
+deployed.
+
+Temporary preview branches and backup or orphaned branches should be deleted
+after the restored deployment has been verified.
+
+A restore is complete only when the application can connect to the database,
+the readiness endpoint succeeds, authentication works, and important records
+have been checked.
